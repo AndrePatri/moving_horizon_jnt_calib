@@ -55,8 +55,30 @@ void CalibTrajReplayerRt::init_vars()
     _q_max = Eigen::VectorXd::Zero(_n_jnts_robot);
     _q_dot_lim = Eigen::VectorXd::Zero(_n_jnts_robot);
 
+    _q_p_init_appr_traj = Eigen::VectorXd::Zero(_n_jnts_robot);
+    _q_p_trgt_appr_traj = Eigen::VectorXd::Zero(_n_jnts_robot);
+
     _jnt_indxs = std::vector<int>(_jnt_list.size());
     std::fill(_jnt_indxs.begin(), _jnt_indxs.end(), -1);
+
+    _omega0 = std::vector<double>(_jnt_list.size());
+    _omegaf = std::vector<double>(_jnt_list.size());
+    _t_exec_omega = std::vector<double>(_jnt_list.size());
+    _q_ub = std::vector<double>(_jnt_list.size());
+    _q_lb = std::vector<double>(_jnt_list.size());
+
+    std::fill(_omega0.begin(), _omega0.end(), _omega0_s);
+    std::fill(_omegaf.begin(), _omegaf.end(), _omegaf_s);
+    std::fill(_t_exec_omega.begin(), _t_exec_omega.end(), _t_exec_omega_s);
+    std::fill(_q_ub.begin(), _q_ub.end(), _q_ub_s);
+    std::fill(_q_lb.begin(), _q_lb.end(), _q_lb_s);
+
+    _sweep_trajs = std::vector<SweepCos>(_jnt_list.size());
+    for (int i = 0; i < _jnt_list.size(); i++)
+    {
+        _sweep_trajs[i] = SweepCos(_omega0[i], _omegaf[i], _t_exec_omega[i],
+                                   _q_lb[i], _q_ub[i]);
+    }
 
 }
 
@@ -71,6 +93,12 @@ void CalibTrajReplayerRt::get_params_from_config()
     _approach_traj_exec_time = getParamOrThrow<double>("~approach_traj_exec_time");
 
     _jnt_list = getParamOrThrow<std::vector<std::string>>("~jnt_list");
+
+    _omega0_s = 2 * M_PI * getParamOrThrow<double>("~f0");
+    _omegaf_s = 2 * M_PI * getParamOrThrow<double>("~ff");
+    _t_exec_omega_s = getParamOrThrow<double>("~t_exec_f");
+    _q_ub_s = getParamOrThrow<double>("~q_ub");
+    _q_lb_s = getParamOrThrow<double>("~q_lb");
 
 }
 
@@ -127,7 +155,6 @@ void CalibTrajReplayerRt::update_state()
 void CalibTrajReplayerRt::send_cmds()
 {
 
-
         if(_send_pos_ref)
         {  
 
@@ -141,6 +168,66 @@ void CalibTrajReplayerRt::send_cmds()
         }
     
     _robot->move(); // send commands to the robot
+}
+
+void CalibTrajReplayerRt::set_approach_trajectory()
+{
+    _approach_traj_phase = _approach_traj_time / _approach_traj_exec_time; // phase ([0, 1] inside the approach traj
+
+    _peisekah_utils.compute_peisekah_vect_val(_approach_traj_phase, _q_p_init_appr_traj, _q_p_trgt_appr_traj, _q_p_cmd);
+}
+
+void CalibTrajReplayerRt::set_cmds()
+{ // always called in each plugin loop
+  // is made of a number of phases, each signaled by suitable flags
+  // remember to increase the sample index at the end of each phase,
+  // if necessary
+
+    if (_is_first_run)
+    { // set cmds to safe values
+
+        if (_verbose)
+        {
+            jhigh().jprint(fmt::fg(fmt::terminal_color::magenta),
+                       "\n (first run) \n");
+        }
+
+        _q_p_cmd = _q_p_meas;
+
+        _q_p_dot_cmd = Eigen::VectorXd::Zero(_n_jnts_robot);
+
+    }
+
+    if(_go2calib_traj)
+    { // we go towards the first sample of the trajectory
+
+        _idle = false;
+
+        if (_approach_traj_time >= _approach_traj_exec_time)
+        {
+            _go2calib_traj = false; // finished approach traj
+            _approach_traj_finished = true;
+            _approach_traj_started = false;
+
+            reset_clocks();
+
+            jhigh().jprint(fmt::fg(fmt::terminal_color::blue),
+                   std::string("\n Approach trajectory finished... ready to perform calibration trajectory \n"));
+
+        }
+        else
+        {// set approach traj cmds
+
+            if (_verbose)
+            {
+                jhigh().jprint(fmt::fg(fmt::terminal_color::magenta),
+                   "\n (setting approach trajectory...) \n");
+            }
+
+            set_approach_trajectory();
+        }
+    }
+
 }
 
 void CalibTrajReplayerRt::init_dump_logger()
@@ -230,27 +317,6 @@ void CalibTrajReplayerRt::saturate_cmds()
 
 }
 
-void CalibTrajReplayerRt::set_cmds()
-{ // always called in each plugin loop
-  // is made of a number of phases, each signaled by suitable flags
-  // remember to increase the sample index at the end of each phase, 
-  // if necessary
-
-    if (_is_first_run)
-    { // set impedance vals and pos ref to safe values at first plugin loop
-
-        if (_verbose)
-        {
-            jhigh().jprint(fmt::fg(fmt::terminal_color::magenta),
-                       "\n (first run) \n");
-        }
-
-        _q_p_cmd = _q_p_meas;
-
-    }
-
-}
-
 void CalibTrajReplayerRt::pub_replay_status()
 {
 
@@ -263,7 +329,7 @@ bool CalibTrajReplayerRt::on_perform_traj_received(const concert_jnt_calib::Perf
     bool approach_state_changed = _go2calib_traj != req.go2calib_traj;
     bool cal_traj_state_changed = _perform_traj != req.perform_calib_traj;
 
-    bool result = false;
+    bool success = false;
 
     if((approach_state_changed && !cal_traj_state_changed) || (!approach_state_changed && cal_traj_state_changed))
     { // we can either ramp towards the initial state of the calibration trajectory or perform the calib. trajectory
@@ -273,6 +339,7 @@ bool CalibTrajReplayerRt::on_perform_traj_received(const concert_jnt_calib::Perf
         {
             _go2calib_traj = req.go2calib_traj;
             _perform_traj = false;
+
         }
 
         if(cal_traj_state_changed)
@@ -280,15 +347,14 @@ bool CalibTrajReplayerRt::on_perform_traj_received(const concert_jnt_calib::Perf
             _go2calib_traj = false;
             _perform_traj = req.perform_calib_traj;
 
-
         }
 
-        result = true;
+        success = true;
     }
     else
     {
 
-        result = false;
+        success = false;
     }
 
     if(_verbose)
@@ -301,9 +367,39 @@ bool CalibTrajReplayerRt::on_perform_traj_received(const concert_jnt_calib::Perf
                       "go2calib_traj: {}\n", _perform_traj);
     }
 
-    res.success = result;
+    if(success && _go2calib_traj)
+    {
+        reset_clocks();
 
-    return result;
+        _q_p_init_appr_traj = _q_p_cmd;
+        _q_p_trgt_appr_traj = _q_p_cmd;
+
+        // we only override the desired joints
+        for (int i = 0; i < _jnt_list.size(); i++)
+        {
+            _sweep_trajs[i].eval_at(_approach_traj_time, _q_p_trgt_appr_traj[_jnt_indxs[i]], _q_dot_temp);
+        }
+
+        _q_p_dot_cmd = Eigen::VectorXd::Zero(_n_jnts_robot);
+
+
+        _approach_traj_started = true;
+
+        _approach_traj_finished = false;
+    }
+
+    if(success && _perform_traj)
+    {
+        reset_clocks();
+
+        _traj_started = true;
+
+        _traj_finished = false;
+    }
+
+    res.success = success;
+
+    return success;
 
 }
 

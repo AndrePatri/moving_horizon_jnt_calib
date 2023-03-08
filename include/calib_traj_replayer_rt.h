@@ -25,8 +25,11 @@
 #include <Eigen/Core>
 #include <Eigen/Geometry>
 
+#include <awesome_utils/awesome_utils/traj_utils.hpp>
+
 using namespace XBot;
 using namespace XBot::Cartesian;
+using namespace TrajUtils;
 
 typedef Eigen::Array<bool, Eigen::Dynamic, 1> VectorXb;
 
@@ -86,20 +89,32 @@ private:
     double _plugin_dt,
         _loop_time = 0.0, _loop_timer_reset_time = 3600.0,
         _traj_time = 0.0, _traj_execution_time = 10.0,
-        _approach_traj_time = 0.0, _approach_traj_exec_time = 3.0,
-        _matlogger_buffer_size = 1e5;
+        _approach_traj_time = 0.0, _approach_traj_exec_time = 3.0, _approach_traj_phase = 0.0,
+        _matlogger_buffer_size = 1e5,
+        _omega0_s = 0, _omegaf_s = 0, _t_exec_omega_s = 10.0, _q_ub_s = 0.0, _q_lb_s = 0.0,
+        _q_temp, _q_dot_temp;
 
     std::vector<std::string> _jnt_list;
     std::vector<int> _jnt_indxs;
+    std::vector<double> _omega0;
+    std::vector<double> _omegaf;
+    std::vector<double> _t_exec_omega;
+    std::vector<double> _q_ub;
+    std::vector<double> _q_lb;
+    std::vector<SweepCos> _sweep_trajs;
+
     std::vector<std::string> _enbld_jnt_names;
 
     Eigen::VectorXd _q_p_meas, _q_p_dot_meas, _tau_meas,
                     _q_p_cmd, _q_p_dot_cmd,
                     _q_p_safe_cmd,
-                    _q_min, _q_max, _q_dot_lim;
+                    _q_min, _q_max, _q_dot_lim,
+                    _q_p_init_appr_traj, _q_p_trgt_appr_traj;
 
     std::vector<double> _q_p_cmd_vect, _q_p_dot_cmd_vect,
                         _tau_cmd_vect;
+
+    PeisekahTrans _peisekah_utils;
 
     MatLogger2::Ptr _dump_logger;
 
@@ -126,6 +141,8 @@ private:
     void update_state();
 
     void update_clocks();
+
+    void set_approach_trajectory();
 
     void set_cmds();
     void send_cmds();

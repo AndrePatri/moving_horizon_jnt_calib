@@ -39,6 +39,12 @@ xbotcore_plugins:
 
             jnt_list: {value: ["J1_A", "J1_C", "J1_B", "J1_D"], type: vector<string>} # joints to be moved
 
+            f0: {value: 0.0, type: double}
+            f0: {value: 3.0, type: double}
+            t_exec_f: {value: 5.0, type: double}
+            q_ub: {value: 0.0, type: double}
+            q_lb: {value: 2.0, type: double}
+
 #    jnt_calibration:
 #        thread: rt_main_slow
 #        type: iq_model_calib_rt
