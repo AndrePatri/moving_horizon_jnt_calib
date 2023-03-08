@@ -26,7 +26,7 @@ void CalibTrajReplayerRt::update_clocks()
     _loop_time += _plugin_dt;
 
 
-    if(!_perform_traj)
+    if(_perform_traj)
     {
         _traj_time += _plugin_dt;
     }
@@ -34,6 +34,16 @@ void CalibTrajReplayerRt::update_clocks()
     if(_traj_finished)
     {
         _traj_time = _traj_execution_time;
+    }
+
+    if(_go2calib_traj)
+    {
+        _approach_traj_time += _plugin_dt;
+    }
+
+    if(_approach_traj_finished)
+    {
+        _approach_traj_time = _approach_traj_exec_time;
     }
 }
 
@@ -64,14 +74,12 @@ void CalibTrajReplayerRt::init_vars()
     _omega0 = std::vector<double>(_jnt_list.size());
     _omegaf = std::vector<double>(_jnt_list.size());
     _t_exec_omega = std::vector<double>(_jnt_list.size());
-    _q_ub = std::vector<double>(_jnt_list.size());
-    _q_lb = std::vector<double>(_jnt_list.size());
 
     std::fill(_omega0.begin(), _omega0.end(), _omega0_s);
     std::fill(_omegaf.begin(), _omegaf.end(), _omegaf_s);
     std::fill(_t_exec_omega.begin(), _t_exec_omega.end(), _t_exec_omega_s);
-    std::fill(_q_ub.begin(), _q_ub.end(), _q_ub_s);
-    std::fill(_q_lb.begin(), _q_lb.end(), _q_lb_s);
+//    std::fill(_q_ub.begin(), _q_ub.end(), _q_ub_s);
+//    std::fill(_q_lb.begin(), _q_lb.end(), _q_lb_s);
 
     _sweep_trajs = std::vector<SweepCos>(_jnt_list.size());
     for (int i = 0; i < _jnt_list.size(); i++)
@@ -97,8 +105,8 @@ void CalibTrajReplayerRt::get_params_from_config()
     _omega0_s = 2 * M_PI * getParamOrThrow<double>("~f0");
     _omegaf_s = 2 * M_PI * getParamOrThrow<double>("~ff");
     _t_exec_omega_s = getParamOrThrow<double>("~t_exec_f");
-    _q_ub_s = getParamOrThrow<double>("~q_ub");
-    _q_lb_s = getParamOrThrow<double>("~q_lb");
+    _q_lb= getParamOrThrow<std::vector<double>>("~q_lb");
+    _q_ub= getParamOrThrow<std::vector<double>>("~q_ub");
 
 }
 
@@ -175,6 +183,13 @@ void CalibTrajReplayerRt::set_approach_trajectory()
     _approach_traj_phase = _approach_traj_time / _approach_traj_exec_time; // phase ([0, 1] inside the approach traj
 
     _peisekah_utils.compute_peisekah_vect_val(_approach_traj_phase, _q_p_init_appr_traj, _q_p_trgt_appr_traj, _q_p_cmd);
+
+    jhigh().jprint(fmt::fg(fmt::terminal_color::blue),
+           std::string("\n _approach_traj_time {} \n"), _approach_traj_time);
+
+    jhigh().jprint(fmt::fg(fmt::terminal_color::blue),
+           std::string("\n _approach_traj_exec_time {} \n"), _approach_traj_exec_time);
+
 }
 
 void CalibTrajReplayerRt::set_cmds()
@@ -203,7 +218,7 @@ void CalibTrajReplayerRt::set_cmds()
 
         _idle = false;
 
-        if (_approach_traj_time >= _approach_traj_exec_time)
+        if (_approach_traj_time > _approach_traj_exec_time - 0.00001)
         {
             _go2calib_traj = false; // finished approach traj
             _approach_traj_finished = true;
@@ -378,6 +393,7 @@ bool CalibTrajReplayerRt::on_perform_traj_received(const concert_jnt_calib::Perf
         for (int i = 0; i < _jnt_list.size(); i++)
         {
             _sweep_trajs[i].eval_at(_approach_traj_time, _q_p_trgt_appr_traj[_jnt_indxs[i]], _q_dot_temp);
+
         }
 
         _q_p_dot_cmd = Eigen::VectorXd::Zero(_n_jnts_robot);
@@ -466,6 +482,19 @@ bool CalibTrajReplayerRt::on_initialize()
     if(!all_jnts_valid)
     {
         std::string exception = std::string("Not all joint names in jnt_list are valid. Check them!!!\n");
+
+        throw std::invalid_argument(exception);
+    }
+
+    if(_q_lb.size() != _q_ub.size())
+    {
+        std::string exception = std::string("Mismatching dimensions in _q_lb({}) and _q_ub({})!!!\n", _q_lb.size(), _q_ub.size());
+
+        throw std::invalid_argument(exception);
+    }
+    if(_q_lb.size() != _jnt_list.size())
+    {
+        std::string exception = std::string("Mismatching dimensions of _q_lb and _q_ub ({}) with _jnt_list!!!\n", _q_lb.size(), _jnt_list.size());
 
         throw std::invalid_argument(exception);
     }
