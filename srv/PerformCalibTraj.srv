@@ -1,0 +1,7 @@
+bool perform_calib_traj
+
+bool go2calib_traj
+
+---
+
+bool success

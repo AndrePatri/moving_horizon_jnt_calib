@@ -13,7 +13,7 @@
 
 #include <std_msgs/Bool.h>
 
-#include <concert_jnt_calib/JntCalRt.h>
+#include <concert_jnt_calib/CalibTrajStatus.h>
 #include <concert_jnt_calib/PerformCalibTraj.h>
 
 #include <cartesian_interface/sdk/rt/LockfreeBufferImpl.h>
@@ -33,7 +33,7 @@ typedef Eigen::Array<bool, Eigen::Dynamic, 1> VectorXb;
 /**
  * @brief
  */
-class JumpReplayerRt : public ControlPlugin
+class CalibTrajReplayerRt : public ControlPlugin
 {
 
 public:
@@ -72,11 +72,12 @@ private:
         _is_sim = true, _is_dummy = false,
         _reduce_dumped_sol_size = false,
         _verbose = false,
+        _go2calib_traj = false, _approach_traj_started = false, _approach_traj_finished = false,
         _perform_traj = false, _traj_started = false, _traj_finished = false,
         _idle = true;
 
     int _n_jnts_robot,
-        _performed_traj = 0;
+        _performed_traj_n = 0;
 
     std::string _dump_mat_suffix = "traj_replay",
                 _hw_type,
@@ -84,14 +85,18 @@ private:
 
     double _plugin_dt,
         _loop_time = 0.0, _loop_timer_reset_time = 3600.0,
-        _traj_time = 0.0, _traj_execution_time = 6.0,
+        _traj_time = 0.0, _traj_execution_time = 10.0,
+        _approach_traj_time = 0.0, _approach_traj_exec_time = 3.0,
         _matlogger_buffer_size = 1e5;
 
-    std::vector<std::string> _cal_jnt_names;
+    std::vector<std::string> _jnt_list;
+    std::vector<int> _jnt_indxs;
+    std::vector<std::string> _enbld_jnt_names;
 
     Eigen::VectorXd _q_p_meas, _q_p_dot_meas, _tau_meas,
                     _q_p_cmd, _q_p_dot_cmd,
-                    _q_p_safe_cmd;
+                    _q_p_safe_cmd,
+                    _q_min, _q_max, _q_dot_lim;
 
     std::vector<double> _q_p_cmd_vect, _q_p_dot_cmd_vect,
                         _tau_cmd_vect;
@@ -102,10 +107,10 @@ private:
 
     CallbackQueue _queue;
 
-    ServiceServerPtr<concert_jnt_calib::JntCalibRtRequest,
-                     concert_jnt_calib::JntCalibRtResponse> _perform_traj_srvr;
+    ServiceServerPtr<concert_jnt_calib::PerformCalibTrajRequest,
+                     concert_jnt_calib::PerformCalibTrajResponse> _perform_traj_srvr;
 
-    PublisherPtr<concert_jnt_calib::JntCalibStatus> _traj_status_pub;
+    PublisherPtr<concert_jnt_calib::CalibTrajStatus> _traj_status_pub;
 
     void get_params_from_config();
 
@@ -134,6 +139,9 @@ private:
     void is_dummy(std::string dummy_string);
 
     void pub_replay_status();
+
+    bool on_perform_traj_received(const concert_jnt_calib::PerformCalibTrajRequest& req,
+                                  concert_jnt_calib::PerformCalibTrajResponse& res);
                  
 };
 

@@ -6,7 +6,9 @@ void CalibTrajReplayerRt::init_clocks()
 {
     _loop_time = 0.0; // reset loop time clock
 
-    _traj_time = 0.0;
+    _traj_time = 0.0; // reset traj time clock
+
+    _approach_traj_time = 0.0; // reset time for approach trajectory
 
 }
 
@@ -14,6 +16,7 @@ void CalibTrajReplayerRt::reset_clocks()
 {
 
     _traj_time = 0.0;
+    _approach_traj_time = 0.0;
 
 }
 
@@ -44,11 +47,16 @@ void CalibTrajReplayerRt::init_vars()
 
     _q_p_safe_cmd = Eigen::VectorXd::Zero(_n_jnts_robot);
 
-    _tau_cmd = Eigen::VectorXd::Zero(_n_jnts_robot);
-
     _q_p_cmd_vect = std::vector<double>(_n_jnts_robot);
     _q_p_dot_cmd_vect = std::vector<double>(_n_jnts_robot);
     _tau_cmd_vect = std::vector<double>(_n_jnts_robot);
+
+    _q_min =  Eigen::VectorXd::Zero(_n_jnts_robot);
+    _q_max = Eigen::VectorXd::Zero(_n_jnts_robot);
+    _q_dot_lim = Eigen::VectorXd::Zero(_n_jnts_robot);
+
+    _jnt_indxs = std::vector<int>(_jnt_list.size());
+    std::fill(_jnt_indxs.begin(), _jnt_indxs.end(), -1);
 
 }
 
@@ -60,7 +68,9 @@ void CalibTrajReplayerRt::get_params_from_config()
 
     _traj_execution_time = getParamOrThrow<double>("~traj_execution_time");
 
-    _cal_jnt_names = getParamOrThrow<std::vector<std::string>>("~jnt_list");
+    _approach_traj_exec_time = getParamOrThrow<double>("~approach_traj_exec_time");
+
+    _jnt_list = getParamOrThrow<std::vector<std::string>>("~jnt_list");
 
 }
 
@@ -129,13 +139,6 @@ void CalibTrajReplayerRt::send_cmds()
 
             _robot->setVelocityReference(_q_p_dot_cmd);
         }
-
-        if (_send_eff_ref)
-        {
-            _robot->setEffortReference(_tau_cmd);
-        }
-
-    }
     
     _robot->move(); // send commands to the robot
 }
@@ -169,24 +172,25 @@ void CalibTrajReplayerRt::init_dump_logger()
 
     _dump_logger->create("q_p_cmd", _n_jnts_robot, 1, _matlogger_buffer_size);
     _dump_logger->create("q_p_dot_cmd", _n_jnts_robot, 1, _matlogger_buffer_size);
-    _dump_logger->create("tau_cmd", _n_jnts_robot, 1, _matlogger_buffer_size);
 
 }
 
 void CalibTrajReplayerRt::add_data2dump_logger()
 {
 
-
-    _dump_logger->add("q_p_cmd", _q_p_cmd);
-    _dump_logger->add("q_p_dot_cmd", _q_p_dot_cmd);
-    _dump_logger->add("tau_cmd", _tau_cmd);
-
-    _dump_logger->add("plugin_time", _loop_time);
+    _dump_logger->add("loop_time", _loop_time);
+    _dump_logger->add("traj_time", _traj_time);
 
     _dump_logger->add("q_p_meas", _q_p_meas);
     _dump_logger->add("q_p_dot_meas", _q_p_dot_meas);
 
-    _dump_logger->add("loop_time", _loop_time);
+    _dump_logger->add("q_p_cmd", _q_p_cmd);
+    _dump_logger->add("q_p_dot_cmd", _q_p_dot_cmd);
+
+    _dump_logger->add("plugin_time", _loop_time);
+
+
+
 
 }
 
@@ -204,25 +208,25 @@ void CalibTrajReplayerRt::init_ros_bridge()
     _ros = std::make_unique<RosSupport>(nh);
 
     /* Service servers */
-    _go2takeoff_config_srvr = _ros->advertiseService(
+    _perform_traj_srvr = _ros->advertiseService(
         "perform_calib_traj",
         &CalibTrajReplayerRt::on_perform_traj_received,
         this,
         &_queue);
 
     /* Publishers */
-    _traj_status_pub = concert_jnt_calib::JntCalibStatus calib_status_;
-    _replay_status_pub = _ros->advertise<concert_jnt_calib::CalibTrajStatus>(
+    concert_jnt_calib::CalibTrajStatus replay_st_prealloc;
+    _traj_status_pub = _ros->advertise<concert_jnt_calib::CalibTrajStatus>(
         "calib_traj_status", 1, replay_st_prealloc);
 
 
 }
+
 void CalibTrajReplayerRt::saturate_cmds()
 {
 
     _robot->enforceJointLimits(_q_p_cmd);
     _robot->enforceVelocityLimit(_q_p_dot_cmd);
-    _robot->enforceEffortLimit(_tau_cmd);
 
 }
 
@@ -252,6 +256,57 @@ void CalibTrajReplayerRt::pub_replay_status()
 
 }
 
+bool CalibTrajReplayerRt::on_perform_traj_received(const concert_jnt_calib::PerformCalibTrajRequest& req,
+                              concert_jnt_calib::PerformCalibTrajResponse& res)
+{
+
+    bool approach_state_changed = _go2calib_traj != req.go2calib_traj;
+    bool cal_traj_state_changed = _perform_traj != req.perform_calib_traj;
+
+    bool result = false;
+
+    if((approach_state_changed && !cal_traj_state_changed) || (!approach_state_changed && cal_traj_state_changed))
+    { // we can either ramp towards the initial state of the calibration trajectory or perform the calib. trajectory
+      // (not both at the same time)
+
+        if(approach_state_changed)
+        {
+            _go2calib_traj = req.go2calib_traj;
+            _perform_traj = false;
+        }
+
+        if(cal_traj_state_changed)
+        {
+            _go2calib_traj = false;
+            _perform_traj = req.perform_calib_traj;
+
+
+        }
+
+        result = true;
+    }
+    else
+    {
+
+        result = false;
+    }
+
+    if(_verbose)
+    {
+        jhigh().jprint(fmt::fg(fmt::terminal_color::magenta),
+                      "CalibTrajReplayerRt: received PerformCalibTrajRequest: -->\n");
+        jhigh().jprint(fmt::fg(fmt::terminal_color::magenta),
+                      "perform_calib_traj: {}\n", _go2calib_traj);
+        jhigh().jprint(fmt::fg(fmt::terminal_color::magenta),
+                      "go2calib_traj: {}\n", _perform_traj);
+    }
+
+    res.success = result;
+
+    return result;
+
+}
+
 bool CalibTrajReplayerRt::on_initialize()
 { 
     std::string sim_flagname = "sim";
@@ -265,18 +320,59 @@ bool CalibTrajReplayerRt::on_initialize()
     _plugin_dt = getPeriodSec();
 
     _n_jnts_robot = _robot->getJointNum();
-    _robot->getVelocityLimits(_jnt_vel_limits);
+    _robot->getVelocityLimits(_q_dot_lim);
+    _robot->getJointLimits(_q_min, _q_max);
+    _enbld_jnt_names = _robot->getEnabledJointNames();
 
     init_vars();
 
     init_ros_bridge();
 
-    load_opt_data(); // load trajectory from file (to be placed here in starting because otherwise
-    // a seg fault will arise)
+    jhigh().jprint(fmt::fg(fmt::terminal_color::blue),
+                          "\n CalibTrajReplayerRt::on_initialize(): enabled joints list --> \n");
 
-    _peisekah_utils = PeisekahTrans();
+    for(int i = 0; i < _enbld_jnt_names.size(); i ++)
+    {
+        jhigh().jprint(fmt::fg(fmt::terminal_color::blue),
+                              "{}\n", _enbld_jnt_names[i]);
+    }
 
-    _q_p_trgt_appr_traj = _q_p_ref.block(1, 0, _n_jnts_robot, 1); // target pos. for the approach traj
+
+    for(int i = 0; i < _jnt_list.size(); i ++)
+    {
+        for(int j = 0; j < _enbld_jnt_names.size(); j++)
+        {
+            if(_jnt_list[i] == _enbld_jnt_names[j])
+            {// joint found
+
+                _jnt_indxs[i] = j;
+
+                 break; // we have the mapping for this joint --> let's exit this loop
+            }
+
+        }
+
+
+    } // non-existent joints will have an index of -1 --> we throw an error in case we provided a non-valid
+      // joint name
+
+    jhigh().jprint(fmt::fg(fmt::terminal_color::blue),
+                          "\n CalibTrajReplayerRt::on_initialize(): joint which will be controlled --> \n");
+
+    for(int i = 0; i < _jnt_list.size(); i ++)
+    {
+        jhigh().jprint(fmt::fg(fmt::terminal_color::blue),
+                              "{}, ID: {}\n", _jnt_list[i], _jnt_indxs[i]);
+    }
+
+    bool all_jnts_valid = !(std::count(_jnt_indxs.begin(), _jnt_indxs.end(), -1));
+
+    if(!all_jnts_valid)
+    {
+        std::string exception = std::string("Not all joint names in jnt_list are valid. Check them!!!\n");
+
+        throw std::invalid_argument(exception);
+    }
 
     return true;
     
@@ -334,8 +430,6 @@ void CalibTrajReplayerRt::on_stop()
 
     init_clocks();
 
-    // Destroy logger and dump .mat file (will be recreated upon plugin restart)
-    _dump_logger->add("performed_jumps", _performed_jumps);
     _dump_logger.reset();
 }
 
