@@ -1,0 +1,43 @@
+<?xml version="1.0" ?>
+<robot name="ModularBot">
+   <group name="chain_A">
+      <chain base_link="mobile_base" tip_link="wheel_A"/>
+   </group>
+   <group name="chain_B">
+      <chain base_link="mobile_base" tip_link="wheel_B"/>
+   </group>
+   <group name="chain_C">
+      <chain base_link="mobile_base" tip_link="wheel_C"/>
+   </group>
+   <group name="chain_D">
+      <chain base_link="mobile_base" tip_link="wheel_D"/>
+   </group>
+   <group name="arms">
+      <group name="chain_A"/>
+      <group name="chain_B"/>
+      <group name="chain_C"/>
+      <group name="chain_D"/>
+   </group>
+   <group name="chains">
+      <group name="chain_A"/>
+      <group name="chain_B"/>
+      <group name="chain_C"/>
+      <group name="chain_D"/>
+   </group>
+   <group name="wheels">
+      <joint name="J_wheel_A"/>
+      <joint name="J_wheel_B"/>
+      <joint name="J_wheel_C"/>
+      <joint name="J_wheel_D"/>
+   </group>
+   <group_state group="chains" name="home">
+      <joint name="J1_A" value="0.0"/>
+      <joint name="J_wheel_A" value="0.0"/>
+      <joint name="J1_B" value="0.0"/>
+      <joint name="J_wheel_B" value="0.0"/>
+      <joint name="J1_C" value="0.0"/>
+      <joint name="J_wheel_C" value="0.0"/>
+      <joint name="J1_D" value="0.0"/>
+      <joint name="J_wheel_D" value="0.0"/>
+   </group_state>
+</robot>

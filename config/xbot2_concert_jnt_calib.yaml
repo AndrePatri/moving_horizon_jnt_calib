@@ -1,0 +1,79 @@
+XBotInterface:
+ urdf_path: $PWD/description/urdf/modularbot.urdf
+ srdf_path: $PWD/description/srdf/modularbot.srdf
+
+ModelInterface:
+  model_type: RBDL
+  is_model_floating_base: true
+
+# hal
+xbotcore_device_configs:
+    sim: $(rospack find concert_xbot2)/hal/ModularBot_gz.yaml
+    dummy: $(rospack find concert_xbot2)/hal/ModularBot_dummy.yaml
+    ec_imp: $(rospack find concert_xbot2)/hal/ModularBot_ec_all.yaml
+    ec_idle: $(rospack find concert_xbot2)/hal/ModularBot_ec_all.yaml
+
+# plugins
+xbotcore_plugins:
+
+    ros_io: {thread: nrt_main, type: ros_io}
+
+    ros_control: {thread: nrt_main, type: ros_control}
+
+    ec_ros: {thread: nrt_main, type: ec_ros}
+
+    jmp_replayer_rt:
+        thread: traj_replay
+        type: jmp_replayer_rt
+        params:
+
+            verbose: {value: false, type: bool}
+
+            traj_execution_time: {value: 0.05, type: double}
+
+    iq_model_calib_rt:
+        thread: rt_main_slow
+        type: iq_model_calib_rt
+        params:
+
+            urdf_path: {value: $PWD/../../description/urdf/generated/awesome_leg_xbot.urdf, type: file} # used by the model interface
+
+            mat_path: {value: /tmp/, type: string}
+            dump_mat_suffix: {value: iq_estimation, type: string}
+            matlogger_buffer_size: {value: 1e5, type: double}
+
+            red_ratio: {value: [0.02, 0.02], type: Eigen::VectorXd}  # gear reduction ratio of the actuator (always <=1)
+
+            K_t: {value: [0.045, 0.045], type: Eigen::VectorXd} # from datasheets: 0.045; torque constant ([Nm/A])
+
+            K_d0_ig: {value: [0.0, 0.0], type: Eigen::VectorXd} # initial guess for the static friction torque coefficient ( tau_d0 = K_d* sign(joint_vel) )
+            K_d1_ig: {value: [0.0, 0.0], type: Eigen::VectorXd} # initial guess for the dynamical friction torque coefficient ( tau_d1 = K_d* joint_vel )
+
+            rotor_axial_MoI: {value: [6.6e-5, 6.6e-5], type: Eigen::VectorXd}  # approximate axial moment of inertia of the rotor ([Kg m^2]); real value 6.5717708e-5
+
+            der_est_order: {value: 1, type: int}
+
+            mov_avrg_cutoff_freq_iq: {value: 15.0, type: double} # cutoff frequency of the moving average filter ([Hz])
+            mov_avrg_cutoff_freq_iq_meas: {value: 15.0, type: double} # cutoff frequency of the moving average filter ([Hz])
+            mov_avrg_cutoff_freq_q_dot: {value: 15.0, type: double} # cutoff frequency of the moving average filter ([Hz])
+            mov_avrg_cutoff_freq_tau: {value: 15.0, type: double} # cutoff frequency of the moving average filter ([Hz])
+
+            iq_calib_window_size: {value: 10000, type: int}
+
+            verbose: {value: false, type: bool}
+
+            lambda_qp_reg: {value: 0.000001, type: double}
+            alpha: {value: 5, type: int}
+            q_dot_3sigma: {value: 0.01, type: double} # max amplitute of the noise contained in the velocity signal
+            # (basically equal to 3 * sigma, where sigma is the standard deviation of the noise)
+
+#            jnt_list: {value: ["J1_A", "J_wheel_A", "J1_B", "J_wheel_B", "J1_C", "J_wheel_C", "J1_D", "J_wheel_D"], type: vector<string>}
+
+            jnt_list: {value: ["J1_A"], type: vector<string>}
+
+# global parameters
+xbotcore_param:
+    /jm/tx_filter_autostart: {value: true, type: bool}
+    /jm/tx_filter_cutoff: {value: 10.0, type: double}
+    # /jm/tx_filter_cutoff: {value: 500.0, type: double}
+    /jm/enable_safety: {value: true, type: bool}  # safety checks (can be disabled in running a simulation. DO NOT DO THIS ON A REAL PROTOTYPE)

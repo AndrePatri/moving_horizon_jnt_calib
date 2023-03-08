@@ -1,0 +1,10 @@
+<package>
+<name>concert_jnt_calib</name>
+<version>0.0.1</version>
+<description>The concert_jnt_calib package</description>
+<maintainer email="andrea.patrizi@iit.it">andrea</maintainer>
+<license>TODO</license>
+<build_depend>message_generation</build_depend>
+<buildtool_depend>catkin</buildtool_depend>
+<run_depend>message_runtime</run_depend>
+</package>
