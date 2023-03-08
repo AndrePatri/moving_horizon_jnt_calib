@@ -532,6 +532,8 @@ void CalibTrajReplayerRt::run()
 
     if(!_idle)
     {
+        saturate_cmds();
+
         send_cmds(); // send commands to the robot
     }
 
