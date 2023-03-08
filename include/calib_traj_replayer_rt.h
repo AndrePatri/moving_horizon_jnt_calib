@@ -92,7 +92,9 @@ private:
         _approach_traj_time = 0.0, _approach_traj_exec_time = 3.0, _approach_traj_phase = 0.0,
         _matlogger_buffer_size = 1e5,
         _omega0_s = 0, _omegaf_s = 0, _t_exec_omega_s = 10.0, _q_ub_s = 0.0, _q_lb_s = 0.0,
-        _q_temp, _q_dot_temp;
+        _q_temp, _q_dot_temp,
+        _sweep_min_t_exec = 0.5;
+
 
     std::vector<std::string> _jnt_list;
     std::vector<int> _jnt_indxs;
@@ -105,14 +107,19 @@ private:
 
     std::vector<std::string> _enbld_jnt_names;
 
+    std::vector<double> _phase_omega;
+    std::vector<bool> _ramp_up;
+    std::vector<double> _omega_k;
+    std::vector<double> _time;
+    std::vector<double> _time_ref;
+
     Eigen::VectorXd _q_p_meas, _q_p_dot_meas, _tau_meas,
                     _q_p_cmd, _q_p_dot_cmd,
                     _q_p_safe_cmd,
                     _q_min, _q_max, _q_dot_lim,
                     _q_p_init_appr_traj, _q_p_trgt_appr_traj;
 
-    std::vector<double> _q_p_cmd_vect, _q_p_dot_cmd_vect,
-                        _tau_cmd_vect;
+    std::vector<double> _q_p_cmd_vect, _q_p_dot_cmd_vect;
 
     PeisekahTrans _peisekah_utils;
 
@@ -143,6 +150,7 @@ private:
     void update_clocks();
 
     void set_approach_trajectory();
+    void set_calib_trajectory();
 
     void set_cmds();
     void send_cmds();
