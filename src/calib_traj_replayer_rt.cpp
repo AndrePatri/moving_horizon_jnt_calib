@@ -75,7 +75,7 @@ void CalibTrajReplayerRt::init_vars()
     _t_exec_omega = std::vector<double>(_jnt_list.size());
 
     _phase_omega = std::vector<double>(_jnt_list.size());
-    _ramp_up = std::vector<bool>(_jnt_list.size());
+    _ramp_up = std::vector<double>(_jnt_list.size());
     _omega_k = std::vector<double>(_jnt_list.size());
     _time = std::vector<double>(_jnt_list.size());
     _time_ref = std::vector<double>(_jnt_list.size());
@@ -88,7 +88,8 @@ void CalibTrajReplayerRt::init_vars()
     for (int i = 0; i < _jnt_list.size(); i++)
     {
         _sweep_trajs[i] = SweepCos(_omega0[i], _omegaf[i], _t_exec_omega[i],
-                                   _q_lb[i], _q_ub[i]);
+                                   _q_lb[i], _q_ub[i],
+                                   _plugin_dt);
     }
 
 }
@@ -406,7 +407,7 @@ void CalibTrajReplayerRt::pub_replay_status()
     status_msg->msg().performed_traj_n = _performed_traj_n;
 
     status_msg->msg().phase_omega = _phase_omega;
-//    status_msg->msg().ramp_up = _ramp_up;
+    status_msg->msg().ramp_up = _ramp_up;
     status_msg->msg().omega_k = _omega_k;
     status_msg->msg().time = _time;
     status_msg->msg().time_ref = _time_ref;

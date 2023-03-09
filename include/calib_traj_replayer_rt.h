@@ -93,7 +93,7 @@ private:
         _matlogger_buffer_size = 1e5,
         _omega0_s = 0, _omegaf_s = 0, _t_exec_omega_s = 10.0, _q_ub_s = 0.0, _q_lb_s = 0.0,
         _q_temp, _q_dot_temp,
-        _sweep_min_t_exec = 0.5;
+        _sweep_min_t_exec = 0.0;
 
 
     std::vector<std::string> _jnt_list;
@@ -108,7 +108,7 @@ private:
     std::vector<std::string> _enbld_jnt_names;
 
     std::vector<double> _phase_omega;
-    std::vector<bool> _ramp_up;
+    std::vector<double> _ramp_up;
     std::vector<double> _omega_k;
     std::vector<double> _time;
     std::vector<double> _time_ref;

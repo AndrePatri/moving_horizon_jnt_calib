@@ -13,7 +13,7 @@ float64[] vel_ref
 uint16 performed_traj_n
 
 float64[] phase_omega
-bool[] ramp_up
+float64[] ramp_up
 float64[] omega_k
 float64[] time
 float64[] time_ref

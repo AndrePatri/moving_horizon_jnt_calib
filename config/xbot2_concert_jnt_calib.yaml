@@ -41,9 +41,9 @@ xbotcore_plugins:
 
 #            jnt_list: {value: ["J1_A"], type: vector<string>} # joints to be moved
 
-            f0: {value: 0.1, type: double}
-            ff: {value: 0.1, type: double}
-            t_exec_f: {value: 20, type: double}
+            f0: {value: 1, type: double}
+            ff: {value: 5, type: double}
+            t_exec_f: {value: 10.0, type: double}
 
             q_ub: {value: [2.0, 2.0, -2.0, -2.0], type: vector<double>}
             q_lb: {value: [-2.0, -2.0, 2.0, 2.0], type: vector<double>}
