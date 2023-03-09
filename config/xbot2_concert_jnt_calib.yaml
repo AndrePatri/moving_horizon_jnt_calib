@@ -33,21 +33,32 @@ xbotcore_plugins:
 
             verbose: {value: false, type: bool}
 
-            traj_execution_time: {value: 600.0, type: double}
+            traj_execution_time: {value: 300.0, type: double}
 
-            approach_traj_exec_time: {value: 5.0, type: double}
+            approach_traj_exec_time: {value: 10.0, type: double}
 
-            jnt_list: {value: ["J1_A", "J1_C", "J1_B", "J1_D"], type: vector<string>} # joints to be moved
-#            jnt_list: {value: ["J1_A"], type: vector<string>} # joints to be moved
+            jnt_list: {value: ["J1_E"], type: vector<string>} # joints to be moved
+#            jnt_list: {value: ["J1_E", "J2_E"], type: vector<string>} # joints to be moved
+#            jnt_list: {value: ["J1_E", "J2_E", "J3_E"], type: vector<string>} # joints to be moved
+#            jnt_list: {value: ["J1_E", "J2_E", "J3_E", "J4_E"], type: vector<string>} # joints to be moved
+#            jnt_list: {value: ["J1_E", "J2_E", "J3_E", "J4_E", "J5_E"], type: vector<string>} # joints to be moved
+#            jnt_list: {value: ["J1_E", "J2_E", "J3_E", "J4_E", "J5_E"], type: vector<string>} # joints to be moved
 
-            q_ub: {value: [2.0, -2.0, -2.0, 2.0], type: vector<double>}
-            q_lb: {value: [-2.0, 2.0, 2.0, -2.0], type: vector<double>}
+            q_ub: {value: [2.5], type: vector<double>}
+            q_lb: {value: [-2.5], type: vector<double>}
+#            q_ub: {value: [2.5, 1], type: vector<double>}
+#            q_lb: {value: [-2.5, -1], type: vector<double>}
+#            q_ub: {value: [2.5, 1, 2.5], type: vector<double>}
+#            q_lb: {value: [-2.5, -1, -2.5], type: vector<double>}
+#            q_ub: {value: [2.5, 1, 2.5, 1], type: vector<double>}
+#            q_lb: {value: [-2.5, -1, -2.5, -1], type: vector<double>}
+#            q_ub: {value: [2.5, 1, 2.5, 1, 2.5], type: vector<double>}
+#            q_lb: {value: [-2.5, -1, -2.5, -1, -2.5], type: vector<double>}
+#            q_ub: {value: [2.5, 1, 2.5, 1, 2.5], type: vector<double>}
+#            q_lb: {value: [-2.5, -1, -2.5, -1, -2.5], type: vector<double>}
 
-#            q_ub: {value: [2.0], type: vector<double>}
-#            q_lb: {value: [-2.0], type: vector<double>}
-
-            f0: {value: 0.1, type: double}
-            ff: {value: 0.4, type: double}
+            f0: {value: 0.05, type: double}
+            ff: {value: 0.1, type: double}
             t_exec_f: {value: 10.0, type: double}
 
 #    jnt_calibration:
@@ -93,6 +104,6 @@ xbotcore_plugins:
 # global parameters
 xbotcore_param:
     /jm/tx_filter_autostart: {value: true, type: bool}
-    /jm/tx_filter_cutoff: {value: 5.0, type: double}
+    /jm/tx_filter_cutoff: {value: 2.0, type: double}
     # /jm/tx_filter_cutoff: {value: 500.0, type: double}
     /jm/enable_safety: {value: true, type: bool}  # safety checks (can be disabled in running a simulation. DO NOT DO THIS ON A REAL PROTOTYPE)

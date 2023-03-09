@@ -12,17 +12,22 @@
    <group name="chain_D">
       <chain base_link="mobile_base" tip_link="wheel_D"/>
    </group>
+   <group name="chain_E">
+      <chain base_link="mobile_base" tip_link="ee_E"/>
+   </group>
    <group name="arms">
       <group name="chain_A"/>
       <group name="chain_B"/>
       <group name="chain_C"/>
       <group name="chain_D"/>
+      <group name="chain_E"/>
    </group>
    <group name="chains">
       <group name="chain_A"/>
       <group name="chain_B"/>
       <group name="chain_C"/>
       <group name="chain_D"/>
+      <group name="chain_E"/>
    </group>
    <group name="wheels">
       <joint name="J_wheel_A"/>
@@ -39,5 +44,10 @@
       <joint name="J_wheel_C" value="0.0"/>
       <joint name="J1_D" value="0.0"/>
       <joint name="J_wheel_D" value="0.0"/>
+      <joint name="J1_E" value="0.0"/>
+      <joint name="J2_E" value="-0.5"/>
+      <joint name="J3_E" value="0.0"/>
+      <joint name="J4_E" value="0.5"/>
+      <joint name="J5_E" value="0.0"/>
    </group_state>
 </robot>

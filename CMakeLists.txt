@@ -12,7 +12,7 @@ find_package(xbot2 REQUIRED)
 find_package(cartesian_interface REQUIRED)
 find_package(matlogger2 REQUIRED)
 
-find_package(catkin REQUIRED std_msgs message_generation)
+find_package(catkin REQUIRED roscpp rospy urdf sensor_msgs std_msgs message_generation)
 
 add_service_files(
   FILES
@@ -45,10 +45,10 @@ target_link_libraries(calib_traj_replayer_rt PRIVATE awesome_utils::awesome_util
 #add_dependencies(jnt_calib_rt ${PROJECT_NAME}_generate_messages)
 #target_link_libraries(jnt_calib_rt PRIVATE awesome_utils::awesome_utils xbot2::xbot2_ros_support ${base_estimation_LIBRARIES})
 
-#add_executable(calib_logger src/calib_logger.cpp)
-#target_link_libraries(calib_logger ${catkin_LIBRARIES} ${XBotInterface_LIBRARIES} matlogger2::matlogger2)
-#target_include_directories(calib_logger PRIVATE ${catkin_INCLUDE_DIRS} ${XBotInterface_INCLUDE_DIRS} ${xbot_msgs_INCLUDE_DIRS})
-#set_target_properties(calib_logger PROPERTIES INSTALL_RPATH_USE_LINK_PATH TRUE)
+add_executable(calib_logger src/calib_logger.cpp)
+target_link_libraries(calib_logger ${catkin_LIBRARIES} ${XBotInterface_LIBRARIES} matlogger2::matlogger2)
+target_include_directories(calib_logger PRIVATE ${catkin_INCLUDE_DIRS} ${XBotInterface_INCLUDE_DIRS} ${xbot_msgs_INCLUDE_DIRS})
+set_target_properties(calib_logger PROPERTIES INSTALL_RPATH_USE_LINK_PATH TRUE)
 
 install(
     TARGETS
@@ -57,5 +57,5 @@ install(
     DESTINATION lib
 )
 
-#install(TARGETS calib_logger DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
+install(TARGETS calib_logger DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 install(PROGRAMS src/launch_rosbag.sh DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
