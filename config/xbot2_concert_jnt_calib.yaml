@@ -31,22 +31,24 @@ xbotcore_plugins:
         type: calib_traj_replayer_rt
         params:
 
-            verbose: {value: true, type: bool}
+            verbose: {value: false, type: bool}
 
             traj_execution_time: {value: 600.0, type: double}
 
             approach_traj_exec_time: {value: 5.0, type: double}
 
             jnt_list: {value: ["J1_A", "J1_C", "J1_B", "J1_D"], type: vector<string>} # joints to be moved
-
 #            jnt_list: {value: ["J1_A"], type: vector<string>} # joints to be moved
+
+            q_ub: {value: [2.0, -2.0, -2.0, 2.0], type: vector<double>}
+            q_lb: {value: [-2.0, 2.0, 2.0, -2.0], type: vector<double>}
+
+#            q_ub: {value: [2.0], type: vector<double>}
+#            q_lb: {value: [-2.0], type: vector<double>}
 
             f0: {value: 0.1, type: double}
             ff: {value: 0.4, type: double}
             t_exec_f: {value: 10.0, type: double}
-
-            q_ub: {value: [2.0, 2.0, -2.0, -2.0], type: vector<double>}
-            q_lb: {value: [-2.0, -2.0, 2.0, 2.0], type: vector<double>}
 
 #    jnt_calibration:
 #        thread: rt_main_slow
@@ -93,4 +95,4 @@ xbotcore_param:
     /jm/tx_filter_autostart: {value: true, type: bool}
     /jm/tx_filter_cutoff: {value: 5.0, type: double}
     # /jm/tx_filter_cutoff: {value: 500.0, type: double}
-    /jm/enable_safety: {value: false, type: bool}  # safety checks (can be disabled in running a simulation. DO NOT DO THIS ON A REAL PROTOTYPE)
+    /jm/enable_safety: {value: true, type: bool}  # safety checks (can be disabled in running a simulation. DO NOT DO THIS ON A REAL PROTOTYPE)

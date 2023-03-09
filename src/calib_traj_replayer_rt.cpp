@@ -494,7 +494,7 @@ bool CalibTrajReplayerRt::on_perform_traj_received(const concert_jnt_calib::Perf
         _approach_traj_finished = false;
     }
 
-    if(success && _perform_traj && _approach_traj_finished)
+    if(success && _perform_traj)
     { // only if the approach traj. was already executed
         reset_clocks();
 
