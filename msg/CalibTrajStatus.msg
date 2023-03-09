@@ -9,6 +9,7 @@ bool send_vel
 
 float64[] pos_ref
 float64[] vel_ref
+float64[] acc_ref
 
 uint16 performed_traj_n
 

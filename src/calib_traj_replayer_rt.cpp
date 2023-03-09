@@ -51,6 +51,7 @@ void CalibTrajReplayerRt::init_vars()
 {
     _q_p_cmd = Eigen::VectorXd::Zero(_n_jnts_robot);
     _q_p_dot_cmd = Eigen::VectorXd::Zero(_n_jnts_robot);
+    _q_p_ddot_cmd = Eigen::VectorXd::Zero(_n_jnts_robot);
 
     _q_p_meas = Eigen::VectorXd::Zero(_n_jnts_robot);
     _q_p_dot_meas = Eigen::VectorXd::Zero(_n_jnts_robot);
@@ -59,6 +60,7 @@ void CalibTrajReplayerRt::init_vars()
 
     _q_p_cmd_vect = std::vector<double>(_n_jnts_robot);
     _q_p_dot_cmd_vect = std::vector<double>(_n_jnts_robot);
+    _q_p_ddot_cmd_vect = std::vector<double>(_n_jnts_robot);
 
     _q_min =  Eigen::VectorXd::Zero(_n_jnts_robot);
     _q_max = Eigen::VectorXd::Zero(_n_jnts_robot);
@@ -77,7 +79,6 @@ void CalibTrajReplayerRt::init_vars()
     _phase_omega = std::vector<double>(_jnt_list.size());
     _ramp_up = std::vector<double>(_jnt_list.size());
     _omega_k = std::vector<double>(_jnt_list.size());
-    _time = std::vector<double>(_jnt_list.size());
     _time_ref = std::vector<double>(_jnt_list.size());
 
     std::fill(_omega0.begin(), _omega0.end(), _omega0_s);
@@ -212,9 +213,9 @@ void CalibTrajReplayerRt::set_calib_trajectory()
     // we only override the desired joints
     for (int i = 0; i < _jnt_list.size(); i++)
     {
-        _sweep_trajs[i].eval_at(_traj_time, _q_p_cmd[_jnt_indxs[i]], _q_dot_temp);
+        _sweep_trajs[i].eval_at(_traj_time, _q_p_cmd[_jnt_indxs[i]], _q_p_dot_cmd[_jnt_indxs[i]], _q_p_ddot_cmd[_jnt_indxs[i]]);
 
-        _sweep_trajs[i].get_stuff(_phase_omega[i], _ramp_up[i], _omega_k[i], _time[i], _time_ref[i]);
+        _sweep_trajs[i].get_stuff(_phase_omega[i], _ramp_up[i], _omega_k[i], _time_ref[i]);
 
 
     }
@@ -409,18 +410,19 @@ void CalibTrajReplayerRt::pub_replay_status()
     status_msg->msg().phase_omega = _phase_omega;
     status_msg->msg().ramp_up = _ramp_up;
     status_msg->msg().omega_k = _omega_k;
-    status_msg->msg().time = _time;
     status_msg->msg().time_ref = _time_ref;
 
     for(int i = 0; i < _n_jnts_robot; i++)
     {
         _q_p_cmd_vect[i] = _q_p_cmd(i);
         _q_p_dot_cmd_vect[i] = _q_p_dot_cmd(i);
+        _q_p_ddot_cmd_vect[i] = _q_p_ddot_cmd(i);
 
     }
 
     status_msg->msg().pos_ref = _q_p_cmd_vect;
     status_msg->msg().vel_ref = _q_p_dot_cmd_vect;
+    status_msg->msg().acc_ref = _q_p_ddot_cmd_vect;
 
     _traj_status_pub->publishLoaned(std::move(status_msg));
 }
@@ -480,7 +482,7 @@ bool CalibTrajReplayerRt::on_perform_traj_received(const concert_jnt_calib::Perf
         // we only override the desired joints
         for (int i = 0; i < _jnt_list.size(); i++)
         {
-            _sweep_trajs[i].eval_at(_approach_traj_time, _q_p_trgt_appr_traj[_jnt_indxs[i]], _q_dot_temp);
+            _sweep_trajs[i].eval_at(_approach_traj_time, _q_p_trgt_appr_traj[_jnt_indxs[i]], _q_dot_temp, _q_ddot_temp);
 
         }
 
