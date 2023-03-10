@@ -224,6 +224,23 @@ void CalibTrajReplayerRt::update_state()
     // Getting robot state
     _robot->getJointPosition(_q_p_meas);
     _robot->getMotorVelocity(_q_p_dot_meas);  
+    _robot->getJointEffort(_tau_meas);
+    _iq_getter.get_last_iq_out(_iq_meas); // raw
+
+    // estimating joint acceleration
+    _num_diff.add_sample(_q_p_dot_meas);
+    _num_diff.dot(_q_p_ddot_meas);
+
+    // filtering data (all with same frequency)
+    _mov_avrg_filter_q_dot.add_sample(_q_p_dot_meas);
+    _mov_avrg_filter_q_ddot.add_sample(_q_p_ddot_meas);
+    _mov_avrg_filter_tau.add_sample(_tau_meas);
+
+    _mov_avrg_filter_q_dot.get(_q_p_dot_meas_filt);
+    _mov_avrg_filter_q_ddot.get(_q_p_ddot_meas_filt);
+    _mov_avrg_filter_tau.get(_tau_meas_filt);
+
+    _iq_getter.get_last_iq_out_filt(_iq_meas_filt); // filtered
 
 }
 
