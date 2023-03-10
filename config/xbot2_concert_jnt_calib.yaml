@@ -61,9 +61,9 @@ xbotcore_plugins:
             ff: {value: 0.1, type: double} # final freq value for sweep calibration traj.
             t_exec_f: {value: 10.0, type: double} # time to ramp from f0 to ff
 
-            red_ratio: {value: [0.02, 0.02], type: Eigen::VectorXd}  # gear reduction ratio of the actuator (always <=1)
-            K_t: {value: [0.045, 0.045], type: Eigen::VectorXd} # torque constants ([Nm/A])
-            rotor_MoI: {value: [6.5717708e-5, 6.57177086e-5], type: Eigen::VectorXd}  # axial moment of inertia of the rotor ([Kg m^2]); real value 6.5717708e-5
+            red_ratio: {value: [0.02], type: Eigen::VectorXd}  # gear reduction ratio of the actuator (always <=1)
+            K_t: {value: [0.045], type: Eigen::VectorXd} # torque constants ([Nm/A])
+            rotor_MoI: {value: [6.5717708e-5], type: Eigen::VectorXd}  # axial moment of inertia of the rotor ([Kg m^2]); real value 6.5717708e-5
             K_d0: {value: [0.0, 0.0], type: Eigen::VectorXd}
             K_d1: {value: [0.0, 0.0], type: Eigen::VectorXd}
 
