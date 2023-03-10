@@ -1,5 +1,9 @@
 bool stop
 
+bool[] mask
+
+float64[] lambda
+
 ---
 
 string message
