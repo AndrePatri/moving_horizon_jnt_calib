@@ -173,6 +173,8 @@ private:
 
     IqOutRosGetter _iq_getter;
 
+    RotDynCal _rot_dyn_calib;
+
     MovAvrgFilt _mov_avrg_filter_tau;
     MovAvrgFilt _mov_avrg_filter_q_dot;
     MovAvrgFilt _mov_avrg_filter_q_ddot;

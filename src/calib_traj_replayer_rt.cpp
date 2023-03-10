@@ -705,7 +705,7 @@ bool CalibTrajReplayerRt::on_initialize()
 
     // initializing calibration-related stuff
 
-    _iq_getter = IqOutRosGetter(_jnt_list, _plugin_dt); // getter for quadrature current measurements from ros topic
+    _iq_getter = IqOutRosGetter(_jnt_list, _plugin_dt, _mov_avrg_cutoff_freq); // getter for quadrature current measurements from ros topic
 
     //filter for tau_meas
     _mov_avrg_filter_tau = MovAvrgFilt(_n_jnts_robot, _plugin_dt, _mov_avrg_cutoff_freq);
