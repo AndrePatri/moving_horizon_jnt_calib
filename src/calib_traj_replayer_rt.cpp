@@ -492,12 +492,12 @@ void CalibTrajReplayerRt::init_ros_bridge()
                                            this,
                                            &_queue);
     /* Publishers */
-    concert_jnt_calib::CalibTrajStatus replay_st_prealloc;
-    _traj_status_pub = _ros->advertise<concert_jnt_calib::CalibTrajStatus>(
+    moving_horizon_jnt_calib::CalibTrajStatus replay_st_prealloc;
+    _traj_status_pub = _ros->advertise<moving_horizon_jnt_calib::CalibTrajStatus>(
         "calib_traj_status", 1, replay_st_prealloc);
 
-    concert_jnt_calib::JntCalibStatus jnt_cal_st_prealloc;
-    _jnt_calib_pub = _ros->advertise<concert_jnt_calib::JntCalibStatus>(
+    moving_horizon_jnt_calib::JntCalibStatus jnt_cal_st_prealloc;
+    _jnt_calib_pub = _ros->advertise<moving_horizon_jnt_calib::JntCalibStatus>(
         "jnt_calib_status", 1, jnt_cal_st_prealloc);
 
     /* Subscribers */
@@ -591,8 +591,8 @@ void CalibTrajReplayerRt::pub_calib_status()
     _jnt_calib_pub->publishLoaned(std::move(status_msg));
 }
 
-bool CalibTrajReplayerRt::on_perform_traj_received(const concert_jnt_calib::PerformCalibTrajRequest& req,
-                              concert_jnt_calib::PerformCalibTrajResponse& res)
+bool CalibTrajReplayerRt::on_perform_traj_received(const moving_horizon_jnt_calib::PerformCalibTrajRequest& req,
+                              moving_horizon_jnt_calib::PerformCalibTrajResponse& res)
 {
 
     bool approach_state_changed = _go2calib_traj != req.go2calib_traj;
@@ -673,8 +673,8 @@ bool CalibTrajReplayerRt::on_perform_traj_received(const concert_jnt_calib::Perf
 
 }
 
-bool CalibTrajReplayerRt::on_jnt_cal_received(const concert_jnt_calib::JntCalibRtRequest& req,
-                              concert_jnt_calib::JntCalibRtResponse& res)
+bool CalibTrajReplayerRt::on_jnt_cal_received(const moving_horizon_jnt_calib::JntCalibRtRequest& req,
+                              moving_horizon_jnt_calib::JntCalibRtResponse& res)
 {
 
     res.success = true;

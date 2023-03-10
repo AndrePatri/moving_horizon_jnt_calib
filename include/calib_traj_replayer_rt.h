@@ -13,11 +13,11 @@
 
 #include <std_msgs/Bool.h>
 
-#include <concert_jnt_calib/CalibTrajStatus.h>
-#include <concert_jnt_calib/PerformCalibTraj.h>
+#include <moving_horizon_jnt_calib/CalibTrajStatus.h>
+#include <moving_horizon_jnt_calib/PerformCalibTraj.h>
 
-#include <concert_jnt_calib/JntCalibStatus.h>
-#include <concert_jnt_calib/JntCalibRt.h>
+#include <moving_horizon_jnt_calib/JntCalibStatus.h>
+#include <moving_horizon_jnt_calib/JntCalibRt.h>
 
 #include <cartesian_interface/sdk/rt/LockfreeBufferImpl.h>
 #include <cartesian_interface/ros/RosServerClass.h>
@@ -171,14 +171,14 @@ private:
 
     CallbackQueue _queue;
 
-    ServiceServerPtr<concert_jnt_calib::PerformCalibTrajRequest,
-                     concert_jnt_calib::PerformCalibTrajResponse> _perform_traj_srvr;
+    ServiceServerPtr<moving_horizon_jnt_calib::PerformCalibTrajRequest,
+                     moving_horizon_jnt_calib::PerformCalibTrajResponse> _perform_traj_srvr;
 
-    ServiceServerPtr<concert_jnt_calib::JntCalibRtRequest,
-                     concert_jnt_calib::JntCalibRtResponse> _set_cal_srvr;
+    ServiceServerPtr<moving_horizon_jnt_calib::JntCalibRtRequest,
+                     moving_horizon_jnt_calib::JntCalibRtResponse> _set_cal_srvr;
 
-    PublisherPtr<concert_jnt_calib::CalibTrajStatus> _traj_status_pub;
-    PublisherPtr<concert_jnt_calib::JntCalibStatus> _jnt_calib_pub;
+    PublisherPtr<moving_horizon_jnt_calib::CalibTrajStatus> _traj_status_pub;
+    PublisherPtr<moving_horizon_jnt_calib::JntCalibStatus> _jnt_calib_pub;
 
     SubscriberPtr<xbot_msgs::CustomState> _aux_signals_sub;
 
@@ -233,11 +233,11 @@ private:
 
     void apply_calib_mask();
 
-    bool on_perform_traj_received(const concert_jnt_calib::PerformCalibTrajRequest& req,
-                                  concert_jnt_calib::PerformCalibTrajResponse& res);
+    bool on_perform_traj_received(const moving_horizon_jnt_calib::PerformCalibTrajRequest& req,
+                                  moving_horizon_jnt_calib::PerformCalibTrajResponse& res);
 
-    bool on_jnt_cal_received(const concert_jnt_calib::JntCalibRtRequest& req,
-                             concert_jnt_calib::JntCalibRtResponse& res);
+    bool on_jnt_cal_received(const moving_horizon_jnt_calib::JntCalibRtRequest& req,
+                             moving_horizon_jnt_calib::JntCalibRtResponse& res);
 };
 
 #endif // CALIB_TRAJ_REPLAYER_RT
