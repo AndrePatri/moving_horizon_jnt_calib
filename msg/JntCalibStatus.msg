@@ -1,6 +1,7 @@
 float64[] iq
 float64[] q_dot
 float64[] q_ddot
+float64[] tau
 
 float64[] alpha_f0
 float64[] alpha_f1

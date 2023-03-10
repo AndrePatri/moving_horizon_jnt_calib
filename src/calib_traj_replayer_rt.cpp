@@ -52,16 +52,21 @@ void CalibTrajReplayerRt::init_vars()
     _q_p_cmd = Eigen::VectorXd::Zero(_n_jnts_robot);
     _q_p_dot_cmd = Eigen::VectorXd::Zero(_n_jnts_robot);
     _q_p_ddot_cmd = Eigen::VectorXd::Zero(_n_jnts_robot);
+    _q_p_safe_cmd = Eigen::VectorXd::Zero(_n_jnts_robot);
 
     _q_p_meas = Eigen::VectorXd::Zero(_n_jnts_robot);
     _q_p_dot_meas = Eigen::VectorXd::Zero(_n_jnts_robot);
-    _q_p_dot_meas_filt = Eigen::VectorXd::Zero(_n_jnts_robot);
     _q_p_ddot_meas = Eigen::VectorXd::Zero(_n_jnts_robot);
-    _q_p_ddot_meas_filt = Eigen::VectorXd::Zero(_n_jnts_robot);
     _tau_meas = Eigen::VectorXd::Zero(_n_jnts_robot);
-    _tau_meas_filt = Eigen::VectorXd::Zero(_n_jnts_robot);
+
     _iq_meas = Eigen::VectorXd::Zero(_jnt_list.size());
     _iq_meas_filt = Eigen::VectorXd::Zero(_jnt_list.size());
+    _q_p_dot_meas_red = Eigen::VectorXd::Zero(_jnt_list.size());
+    _q_p_dot_meas_red_filt = Eigen::VectorXd::Zero(_jnt_list.size());
+    _q_p_ddot_meas_red = Eigen::VectorXd::Zero(_jnt_list.size());
+    _q_p_ddot_meas_red_filt = Eigen::VectorXd::Zero(_jnt_list.size());
+    _tau_meas_red  = Eigen::VectorXd::Zero(_jnt_list.size());
+    _tau_meas_red_filt = Eigen::VectorXd::Zero(_jnt_list.size());
 
     _jnt_cal_sol_millis = Eigen::VectorXd::Zero(_jnt_list.size());
     _alpha_f0 = Eigen::VectorXd::Zero(_jnt_list.size());
@@ -75,8 +80,6 @@ void CalibTrajReplayerRt::init_vars()
     _K_d1_ig = Eigen::VectorXd::Zero(_jnt_list.size());
     _rot_MoI_ig = Eigen::VectorXd::Zero(_jnt_list.size());
     _K_t_ig = Eigen::VectorXd::Zero(_jnt_list.size());
-
-    _q_p_safe_cmd = Eigen::VectorXd::Zero(_n_jnts_robot);
 
     _q_p_cmd_vect = std::vector<double>(_n_jnts_robot);
     _q_p_dot_cmd_vect = std::vector<double>(_n_jnts_robot);
@@ -231,22 +234,51 @@ void CalibTrajReplayerRt::update_state()
     _robot->getJointPosition(_q_p_meas);
     _robot->getMotorVelocity(_q_p_dot_meas);  
     _robot->getJointEffort(_tau_meas);
-    _iq_getter.get_last_iq_out(_iq_meas); // raw
+
+    // extracting only relevant info
+    for (int i = 0; i < _jnt_list.size(); i++)
+    {
+        _q_p_dot_meas_red(i) = _q_p_dot_meas(_jnt_indxs[i]);
+
+        _tau_meas_red(i) = _tau_meas(_jnt_indxs[i]);
+
+    }
 
     // estimating joint acceleration
-    _num_diff.add_sample(_q_p_dot_meas);
-    _num_diff.dot(_q_p_ddot_meas);
+    _num_diff.add_sample(_q_p_dot_meas_red);
+    _num_diff.dot(_q_p_ddot_meas_red);
+
+    if(_is_sim || _is_dummy)
+    {
+        update_iq_estimation();
+
+    }
+    else
+    { // we're on the real robot
+
+        _iq_getter.get_last_iq_out(_iq_meas); // raw
+
+    }
 
     // filtering data (all with same frequency)
-    _mov_avrg_filter_q_dot.add_sample(_q_p_dot_meas);
-    _mov_avrg_filter_q_ddot.add_sample(_q_p_ddot_meas);
-    _mov_avrg_filter_tau.add_sample(_tau_meas);
+    _mov_avrg_filter_q_dot.add_sample(_q_p_dot_meas_red);
+    _mov_avrg_filter_q_ddot.add_sample(_q_p_ddot_meas_red);
+    _mov_avrg_filter_tau.add_sample(_tau_meas_red);
 
-    _mov_avrg_filter_q_dot.get(_q_p_dot_meas_filt);
-    _mov_avrg_filter_q_ddot.get(_q_p_ddot_meas_filt);
-    _mov_avrg_filter_tau.get(_tau_meas_filt);
+    _mov_avrg_filter_q_dot.get(_q_p_dot_meas_red_filt);
+    _mov_avrg_filter_q_ddot.get(_q_p_ddot_meas_red_filt);
+    _mov_avrg_filter_tau.get(_tau_meas_red_filt);
 
     _iq_getter.get_last_iq_out_filt(_iq_meas_filt); // filtered
+
+}
+
+void CalibTrajReplayerRt::update_iq_estimation()
+{
+
+    _iq_estimator.set_current_state(_q_p_dot_meas_red_filt, _q_p_ddot_meas_red_filt, _tau_meas_red_filt);
+
+    _iq_estimator.get_iq_estimate(_iq_meas);
 
 }
 
@@ -525,8 +557,9 @@ void CalibTrajReplayerRt::pub_calib_status()
     for(int i = 0; i < _jnt_list.size(); i++)
     {
         _iq_meas_vect[i] = _iq_meas(i);
-        _q_p_dot_meas_vect[i] = _q_p_dot_meas_filt(_jnt_indxs[i]);
-        _q_p_ddot_est_vect[i] = _q_p_ddot_meas_filt(_jnt_indxs[i]);
+        _q_p_dot_meas_vect[i] = _q_p_dot_meas_red_filt(i);
+        _q_p_ddot_est_vect[i] = _q_p_ddot_meas_red_filt(i);
+        _tau_meas_vect[i] = _tau_meas_red_filt(i);
         _alpha_f0_vect[i] = _alpha_f0[i];
         _alpha_f1_vect[i] = _alpha_f1[i];
         _K_d0_vect[i] = _K_d0[i];
@@ -646,6 +679,13 @@ bool CalibTrajReplayerRt::on_jnt_cal_received(const concert_jnt_calib::JntCalibR
 
 }
 
+void CalibTrajReplayerRt::run_jnt_calib()
+{
+
+}
+
+
+
 bool CalibTrajReplayerRt::on_initialize()
 { 
     std::string sim_flagname = "sim";
@@ -731,19 +771,19 @@ bool CalibTrajReplayerRt::on_initialize()
     _iq_getter = IqOutRosGetter(_jnt_list, _plugin_dt, _mov_avrg_cutoff_freq); // getter for quadrature current measurements from ros topic
 
     //filter for tau_meas
-    _mov_avrg_filter_tau = MovAvrgFilt(_n_jnts_robot, _plugin_dt, _mov_avrg_cutoff_freq);
+    _mov_avrg_filter_tau = MovAvrgFilt(_jnt_list.size(), _plugin_dt, _mov_avrg_cutoff_freq);
     _mov_avrg_filter_tau.get_window_size(_mov_avrg_window_size); // get computed window size
 
     //filter for q_dot
-    _mov_avrg_filter_q_dot = MovAvrgFilt(_n_jnts_robot, _plugin_dt, _mov_avrg_cutoff_freq);
+    _mov_avrg_filter_q_dot = MovAvrgFilt(_jnt_list.size(), _plugin_dt, _mov_avrg_cutoff_freq);
     _mov_avrg_filter_tau.get_window_size(_mov_avrg_window_size); // get computed window size
 
     //filter for q_ddot
-    _mov_avrg_filter_q_ddot = MovAvrgFilt(_n_jnts_robot, _plugin_dt, _mov_avrg_cutoff_freq);
+    _mov_avrg_filter_q_ddot = MovAvrgFilt(_jnt_list.size(), _plugin_dt, _mov_avrg_cutoff_freq);
     _mov_avrg_filter_q_ddot.get_window_size(_mov_avrg_window_size); // get computed window size
 
     // numerical differentiation
-    _num_diff = NumDiff(_n_jnts_robot, _plugin_dt, 1);
+    _num_diff = NumDiff(_jnt_list.size(), _plugin_dt, 1);
 
     // actuator dynamics calibration
 
@@ -757,6 +797,15 @@ bool CalibTrajReplayerRt::on_initialize()
                                 _alpha,
                                 _q_dot_3sigma,
                                 _verbose);
+
+    // iq estimator, just to check calibration in simulation
+
+    _iq_estimator = IqEstimator(_K_t_nom,
+                                _K_d0_nom, _K_d1_nom,
+                                _rot_MoI_nom,
+                                _red_ratio,
+                                _alpha,
+                                _q_dot_3sigma); // object to compute iq estimate
     return true;
     
 }
