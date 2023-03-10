@@ -105,7 +105,6 @@ private:
         _omega0_s = 0, _omegaf_s = 0, _t_exec_omega_s = 10.0, _q_ub_s = 0.0, _q_lb_s = 0.0,
         _q_temp, _q_dot_temp, _q_ddot_temp,
         _sweep_min_t_exec = 0.5,
-        _lambda_qp_reg = 0.000001,
         _q_dot_3sigma = 0.01;
 
     std::vector<std::string> _jnt_list;
@@ -139,6 +138,8 @@ private:
                     _q_p_safe_cmd,
                     _q_min, _q_max, _q_dot_lim,
                     _q_p_init_appr_traj, _q_p_trgt_appr_traj;
+
+    Eigen::VectorXd _lambda;
 
     std::vector<double> _q_p_cmd_vect, _q_p_dot_cmd_vect, _q_p_ddot_cmd_vect;
 

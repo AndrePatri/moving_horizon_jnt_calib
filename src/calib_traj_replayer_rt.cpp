@@ -178,7 +178,7 @@ void CalibTrajReplayerRt::get_params_from_config()
 
     _cal_mask = getParamOrThrow<std::vector<bool>>("~cal_mask");
     _rot_calib_window_size = getParamOrThrow<int>("~rot_calib_window_size");
-    _lambda_qp_reg = getParamOrThrow<double>("~lambda_qp_reg");
+    _lambda = getParamOrThrow<Eigen::VectorXd>("~lambda");
     _alpha = getParamOrThrow<int>("~alpha");
     _q_dot_3sigma = getParamOrThrow<double>("~q_dot_3sigma");
 }
@@ -747,7 +747,16 @@ bool CalibTrajReplayerRt::on_initialize()
 
     // actuator dynamics calibration
 
-//    _rot_dyn_calib =_ RotDynCal();
+    _rot_dyn_calib = RotDynCal(_rot_calib_window_size,
+                                _red_ratio,
+                                _K_t_ig,
+                                _rot_MoI_ig,
+                                _K_d0_ig,
+                                _K_d1_ig,
+                                _lambda,
+                                _alpha,
+                                _q_dot_3sigma,
+                                _verbose);
     return true;
     
 }
