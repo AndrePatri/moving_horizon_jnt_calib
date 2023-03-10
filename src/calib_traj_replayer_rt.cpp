@@ -376,11 +376,25 @@ void CalibTrajReplayerRt::init_ros_bridge()
         this,
         &_queue);
 
+    _set_cal_srvr = _ros->advertiseService("set_jnt_cal",
+                                           &CalibTrajReplayerRt::on_jnt_cal_received,
+                                           this,
+                                           &_queue);
     /* Publishers */
     concert_jnt_calib::CalibTrajStatus replay_st_prealloc;
     _traj_status_pub = _ros->advertise<concert_jnt_calib::CalibTrajStatus>(
         "calib_traj_status", 1, replay_st_prealloc);
 
+    concert_jnt_calib::JntCalibStatus jnt_cal_st_prealloc;
+    _jnt_calib_pub = _ros->advertise<concert_jnt_calib::JntCalibStatus>(
+        "jnt_calib_status", 1, jnt_cal_st_prealloc);
+
+    /* Subscribers */
+    _aux_signals_sub = _ros->subscribe("/xbotcore/aux",
+                                &Xbot2Utils::IqOutRosGetter::on_aux_signal_received,
+                                &_iq_getter,
+                                1,  // queue size
+                                &_queue);
 
 }
 
@@ -588,6 +602,19 @@ bool CalibTrajReplayerRt::on_initialize()
 
         throw std::invalid_argument(exception);
     }
+
+
+    // initializing calibration-related stuff
+
+    _iq_getter = IqOutRosGetter(_enbld_jnt_names, _plugin_dt); // getter for quadrature current measurements from ros topic
+
+    //filter for tau_meas
+    _mov_avrg_filter_tau = MovAvrgFilt(_n_jnts_robot, _plugin_dt, _mov_avrg_cutoff_freq_tau);
+    _mov_avrg_filter_tau.get_window_size(_mov_avrg_window_size_tau); // get computed window size
+
+    //filter for q_dot
+    _mov_avrg_filter_q_dot = MovAvrgFilt(_n_jnts_robot, _plugin_dt, _mov_avrg_cutoff_freq_q_dot);
+    _mov_avrg_filter_tau.get_window_size(_mov_avrg_window_size_q_dot); // get computed window size
 
     return true;
     

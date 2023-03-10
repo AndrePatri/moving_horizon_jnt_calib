@@ -16,6 +16,9 @@
 #include <concert_jnt_calib/CalibTrajStatus.h>
 #include <concert_jnt_calib/PerformCalibTraj.h>
 
+#include <concert_jnt_calib/JntCalibStatus.h>
+#include <concert_jnt_calib/JntCalibRt.h>
+
 #include <cartesian_interface/sdk/rt/LockfreeBufferImpl.h>
 #include <cartesian_interface/ros/RosServerClass.h>
 
@@ -26,10 +29,16 @@
 #include <Eigen/Geometry>
 
 #include <awesome_utils/awesome_utils/traj_utils.hpp>
+#include <awesome_utils/xbot2_utils/xbot2_utils.hpp>
+#include <awesome_utils/awesome_utils/sign_proc_utils.hpp>
+#include <awesome_utils/awesome_utils/calib_utils.hpp>
 
 using namespace XBot;
 using namespace XBot::Cartesian;
 using namespace TrajUtils;
+using namespace CalibUtils;
+using namespace SignProcUtils;
+using namespace Xbot2Utils;
 
 typedef Eigen::Array<bool, Eigen::Dynamic, 1> VectorXb;
 
@@ -131,7 +140,22 @@ private:
     ServiceServerPtr<concert_jnt_calib::PerformCalibTrajRequest,
                      concert_jnt_calib::PerformCalibTrajResponse> _perform_traj_srvr;
 
+    ServiceServerPtr<concert_jnt_calib::JntCalibRtRequest,
+                     concert_jnt_calib::JntCalibRtResponse> _set_cal_srvr;
+
     PublisherPtr<concert_jnt_calib::CalibTrajStatus> _traj_status_pub;
+    PublisherPtr<concert_jnt_calib::JntCalibStatus> _jnt_calib_pub;
+
+    SubscriberPtr<xbot_msgs::CustomState> _aux_signals_sub;
+
+    IqOutRosGetter _iq_getter;
+
+    MovAvrgFilt _mov_avrg_filter_tau;
+    MovAvrgFilt _mov_avrg_filter_q_dot;
+    int _mov_avrg_window_size_tau = 10;
+    double _mov_avrg_cutoff_freq_tau = 15.0;
+    int _mov_avrg_window_size_q_dot= 10;
+    double _mov_avrg_cutoff_freq_q_dot = 15.0;
 
     void get_params_from_config();
 
@@ -163,10 +187,13 @@ private:
     void is_dummy(std::string dummy_string);
 
     void pub_replay_status();
+    void pub_calib_status();
 
     bool on_perform_traj_received(const concert_jnt_calib::PerformCalibTrajRequest& req,
                                   concert_jnt_calib::PerformCalibTrajResponse& res);
-                 
+
+    bool on_jnt_cal_received(const concert_jnt_calib::JntCalibRtRequest& req,
+                             concert_jnt_calib::JntCalibRtResponse& res);
 };
 
 #endif // CALIB_TRAJ_REPLAYER_RT
