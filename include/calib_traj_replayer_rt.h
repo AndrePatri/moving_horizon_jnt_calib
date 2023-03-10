@@ -131,6 +131,7 @@ private:
                     _jnt_cal_sol_millis, _alpha_f0, _alpha_f1,
                     _K_d0, _K_d1, _rot_MoI, _K_t, _red_ratio,
                     _K_d0_ig, _K_d1_ig, _rot_MoI_ig, _K_t_ig,
+                    _K_d0_nom, _K_d1_nom, _rot_MoI_nom, _K_t_nom,
                     _q_p_cmd, _q_p_dot_cmd, _q_p_ddot_cmd,
                     _q_p_safe_cmd,
                     _q_min, _q_max, _q_dot_lim,

@@ -167,7 +167,12 @@ void CalibTrajReplayerRt::get_params_from_config()
     _K_t_ig = getParamOrThrow<Eigen::VectorXd>("~K_t_ig");
     _rot_MoI_ig = getParamOrThrow<Eigen::VectorXd>("~rot_MoI_ig");
     _K_d0_ig = getParamOrThrow<Eigen::VectorXd>("~K_d0_ig");
-    _K_d1_ig = getParamOrThrow<Eigen::VectorXd>("~K_d0_ig");
+    _K_d1_ig = getParamOrThrow<Eigen::VectorXd>("~K_d1_ig");
+
+    _K_t_nom = getParamOrThrow<Eigen::VectorXd>("~K_t_nom");
+    _rot_MoI_nom = getParamOrThrow<Eigen::VectorXd>("~rot_MoI_nom");
+    _K_d0_nom = getParamOrThrow<Eigen::VectorXd>("~K_d0_nom");
+    _K_d1_nom = getParamOrThrow<Eigen::VectorXd>("~K_d1_nom");
 
     _cal_mask = getParamOrThrow<std::vector<bool>>("~cal_mask");
 }

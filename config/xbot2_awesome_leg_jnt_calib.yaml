@@ -59,6 +59,11 @@ xbotcore_plugins:
             K_d0_ig: {value: [0.0, 0.0], type: Eigen::VectorXd} # initial guess for the static friction torque coefficient ( tau_d0 = K_d* sign(joint_vel) )
             K_d1_ig: {value: [0.0, 0.0], type: Eigen::VectorXd} # initial guess for the dynamical friction torque coefficient ( tau_d1 = K_d* joint_vel )
 
+            K_t_nom: {value: [0.045, 0.045], type: Eigen::VectorXd}
+            rot_MoI_nom: {value: [6.5717708e-5, 6.57177086e-5], type: Eigen::VectorXd}
+            K_d0_nom: {value: [0.0, 0.0], type: Eigen::VectorXd} # initial guess for the static friction torque coefficient ( tau_d0 = K_d* sign(joint_vel) )
+            K_d1_nom: {value: [0.0, 0.0], type: Eigen::VectorXd} # initial guess for the dynamical friction torque coefficient ( tau_d1 = K_d* joint_vel )
+
 
 # global parameters
 xbotcore_param:
