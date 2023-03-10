@@ -1,7 +1,7 @@
 <package>
-<name>concert_jnt_calib</name>
+<name>moving_horizon_jnt_calib</name>
 <version>0.0.1</version>
-<description>The concert_jnt_calib package</description>
+<description> package for testing mhe utilities </description>
 <maintainer email="andrea.patrizi@iit.it">andrea</maintainer>
 <license>TODO</license>
 <build_depend>message_generation</build_depend>

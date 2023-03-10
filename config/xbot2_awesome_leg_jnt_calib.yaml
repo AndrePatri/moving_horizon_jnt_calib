@@ -1,0 +1,123 @@
+XBotInterface:
+ urdf_path: $PWD/../description/urdf/modularbot.urdf
+ srdf_path: $PWD/../description/srdf/modularbot.srdf
+
+ModelInterface:
+  model_type: RBDL
+  is_model_floating_base: true
+
+# hal
+xbotcore_device_configs:
+    sim: $(rospack find concert_xbot2)/hal/ModularBot_gz.yaml
+    dummy: $(rospack find concert_xbot2)/hal/ModularBot_dummy.yaml
+    ec_imp: $(rospack find concert_xbot2)/hal/ModularBot_ec_all.yaml
+    ec_idle: $(rospack find concert_xbot2)/hal/ModularBot_ec_all.yaml
+
+xbotcore_threads:
+    rt_main:  {sched: fifo , prio: 60, period: 0.005, core_id: 0}
+    nrt_main: {sched: other, prio: 0 , period: 0.01}
+
+# plugins
+xbotcore_plugins:
+
+    ros_io: {thread: nrt_main, type: ros_io}
+
+    ros_control: {thread: nrt_main, type: ros_control}
+
+    ec_ros: {thread: nrt_main, type: ec_ros}
+
+    traj_replayer:
+        thread: rt_main
+        type: calib_traj_replayer_rt
+        params:
+
+            verbose: {value: false, type: bool}
+
+            traj_execution_time: {value: 300.0, type: double}
+
+            approach_traj_exec_time: {value: 10.0, type: double}
+
+            jnt_list: {value: ["J1_E"], type: vector<string>} # joints to be calibrated
+#            jnt_list: {value: ["J1_E", "J2_E"], type: vector<string>} # joints to be moved
+#            jnt_list: {value: ["J1_E", "J2_E", "J3_E"], type: vector<string>} # joints to be moved
+#            jnt_list: {value: ["J1_E", "J2_E", "J3_E", "J4_E"], type: vector<string>} # joints to be moved
+#            jnt_list: {value: ["J1_E", "J2_E", "J3_E", "J4_E", "J5_E"], type: vector<string>} # joints to be moved
+#            jnt_list: {value: ["J1_E", "J2_E", "J3_E", "J4_E", "J5_E"], type: vector<string>} # joints to be moved
+
+            q_ub: {value: [2.5], type: vector<double>}
+            q_lb: {value: [-2.5], type: vector<double>}
+#            q_ub: {value: [2.5, 1], type: vector<double>}
+#            q_lb: {value: [-2.5, -1], type: vector<double>}
+#            q_ub: {value: [2.5, 1, 2.5], type: vector<double>}
+#            q_lb: {value: [-2.5, -1, -2.5], type: vector<double>}
+#            q_ub: {value: [2.5, 1, 2.5, 1], type: vector<double>}
+#            q_lb: {value: [-2.5, -1, -2.5, -1], type: vector<double>}
+#            q_ub: {value: [2.5, 1, 2.5, 1, 2.5], type: vector<double>}
+#            q_lb: {value: [-2.5, -1, -2.5, -1, -2.5], type: vector<double>}
+#            q_ub: {value: [2.5, 1, 2.5, 1, 2.5], type: vector<double>}
+#            q_lb: {value: [-2.5, -1, -2.5, -1, -2.5], type: vector<double>}
+
+            f0: {value: 0.05, type: double} # initial freq value for sweep calibration traj.
+            ff: {value: 0.1, type: double} # final freq value for sweep calibration traj.
+            t_exec_f: {value: 10.0, type: double} # time to ramp from f0 to ff
+
+            red_ratio: {value: [0.02], type: Eigen::VectorXd}  # gear reduction ratio of the actuator (always <=1)
+            K_t: {value: [0.045], type: Eigen::VectorXd} # torque constants ([Nm/A])
+            rotor_MoI: {value: [6.5717708e-5], type: Eigen::VectorXd}  # axial moment of inertia of the rotor ([Kg m^2]); real value 6.5717708e-5
+            K_d0: {value: [0.0, 0.0], type: Eigen::VectorXd}
+            K_d1: {value: [0.0, 0.0], type: Eigen::VectorXd}
+
+            cal_mask: {value: [false, true, true, false], type: vector<bool>} # which components of rotor's dynamics to calibrate: [K_t, K_d0, K_d1, rot_MoI]
+
+            K_t_ig: {value: [0.045, 0.045], type: Eigen::VectorXd}
+            rot_MoI_ig: {value: [6.5717708e-5, 6.57177086e-5], type: Eigen::VectorXd}
+            K_d0_ig: {value: [0.0, 0.0], type: Eigen::VectorXd} # initial guess for the static friction torque coefficient ( tau_d0 = K_d* sign(joint_vel) )
+            K_d1_ig: {value: [0.0, 0.0], type: Eigen::VectorXd} # initial guess for the dynamical friction torque coefficient ( tau_d1 = K_d* joint_vel )
+
+
+#    jnt_calibration:
+#        thread: rt_main_slow
+#        type: iq_model_calib_rt
+#        params:
+
+#            urdf_path: {value: $PWD/../../description/urdf/generated/awesome_leg_xbot.urdf, type: file} # used by the model interface
+
+#            mat_path: {value: /tmp/, type: string}
+#            dump_mat_suffix: {value: iq_estimation, type: string}
+#            matlogger_buffer_size: {value: 1e5, type: double}
+
+#            red_ratio: {value: [0.02, 0.02], type: Eigen::VectorXd}  # gear reduction ratio of the actuator (always <=1)
+
+#            K_t: {value: [0.045, 0.045], type: Eigen::VectorXd} # from datasheets: 0.045; torque constant ([Nm/A])
+
+#            K_d0_ig: {value: [0.0, 0.0], type: Eigen::VectorXd} # initial guess for the static friction torque coefficient ( tau_d0 = K_d* sign(joint_vel) )
+#            K_d1_ig: {value: [0.0, 0.0], type: Eigen::VectorXd} # initial guess for the dynamical friction torque coefficient ( tau_d1 = K_d* joint_vel )
+
+#            rotor_axial_MoI: {value: [6.6e-5, 6.6e-5], type: Eigen::VectorXd}  # approximate axial moment of inertia of the rotor ([Kg m^2]); real value 6.5717708e-5
+
+#            der_est_order: {value: 1, type: int}
+
+#            mov_avrg_cutoff_freq_iq: {value: 15.0, type: double} # cutoff frequency of the moving average filter ([Hz])
+#            mov_avrg_cutoff_freq_iq_meas: {value: 15.0, type: double} # cutoff frequency of the moving average filter ([Hz])
+#            mov_avrg_cutoff_freq_q_dot: {value: 15.0, type: double} # cutoff frequency of the moving average filter ([Hz])
+#            mov_avrg_cutoff_freq_tau: {value: 15.0, type: double} # cutoff frequency of the moving average filter ([Hz])
+
+#            iq_calib_window_size: {value: 10000, type: int}
+
+#            verbose: {value: false, type: bool}
+
+#            lambda_qp_reg: {value: 0.000001, type: double}
+#            alpha: {value: 5, type: int}
+#            q_dot_3sigma: {value: 0.01, type: double} # max amplitute of the noise contained in the velocity signal
+#            # (basically equal to 3 * sigma, where sigma is the standard deviation of the noise)
+
+##            jnt_list: {value: ["J1_A", "J_wheel_A", "J1_B", "J_wheel_B", "J1_C", "J_wheel_C", "J1_D", "J_wheel_D"], type: vector<string>}
+
+#            jnt_list: {value: ["J1_A"], type: vector<string>}
+
+# global parameters
+xbotcore_param:
+    /jm/tx_filter_autostart: {value: true, type: bool}
+    /jm/tx_filter_cutoff: {value: 2.0, type: double}
+    # /jm/tx_filter_cutoff: {value: 500.0, type: double}
+    /jm/enable_safety: {value: true, type: bool}  # safety checks (can be disabled in running a simulation. DO NOT DO THIS ON A REAL PROTOTYPE)
