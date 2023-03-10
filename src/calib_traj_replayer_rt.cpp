@@ -71,6 +71,10 @@ void CalibTrajReplayerRt::init_vars()
     _jnt_cal_sol_millis = Eigen::VectorXd::Zero(_jnt_list.size());
     _alpha_f0 = Eigen::VectorXd::Zero(_jnt_list.size());
     _alpha_f1 = Eigen::VectorXd::Zero(_jnt_list.size());
+    _tau_friction = Eigen::VectorXd::Zero(_jnt_list.size());
+    _tau_mot = Eigen::VectorXd::Zero(_jnt_list.size());
+    _tau_inertial = Eigen::VectorXd::Zero(_jnt_list.size());
+
     _K_d0 = Eigen::VectorXd::Zero(_jnt_list.size());
     _K_d1 = Eigen::VectorXd::Zero(_jnt_list.size());
     _rot_MoI = Eigen::VectorXd::Zero(_jnt_list.size());
@@ -679,12 +683,53 @@ bool CalibTrajReplayerRt::on_jnt_cal_received(const concert_jnt_calib::JntCalibR
 
 }
 
+
 void CalibTrajReplayerRt::run_jnt_calib()
 {
 
 }
 
+void CalibTrajReplayerRt::apply_calib_mask()
+{
+    _rot_dyn_calib.set_solution_mask(_cal_mask);
 
+    if(_cal_mask[0] = false)
+    { // Kt
+        _rot_dyn_calib.set_ig_Kt(_K_t_nom);
+    }
+    else
+    {
+        _rot_dyn_calib.set_ig_Kt(_K_t_ig);
+    }
+
+    if(_cal_mask[1] = false)
+    { // rot_MoI
+        _rot_dyn_calib.set_ig_MoI(_rot_MoI_nom);
+    }
+    else
+    {
+        _rot_dyn_calib.set_ig_MoI(_rot_MoI_ig);
+    }
+    if(_cal_mask[2] = false)
+    { // Kd0
+        _rot_dyn_calib.set_ig_Kd0(_K_d0_nom);
+    }
+    else
+    {
+        _rot_dyn_calib.set_ig_Kd0(_K_d0_ig);
+    }
+
+    if(_cal_mask[3] = false)
+    { // Kd1
+        _rot_dyn_calib.set_ig_Kd1(_K_d1_nom);
+    }
+    else
+    {
+        _rot_dyn_calib.set_ig_Kd1(_K_d1_ig);
+
+    }
+
+}
 
 bool CalibTrajReplayerRt::on_initialize()
 { 
@@ -797,6 +842,26 @@ bool CalibTrajReplayerRt::on_initialize()
                                 _alpha,
                                 _q_dot_3sigma,
                                 _verbose);
+
+    apply_calib_mask();
+    _rot_dyn_calib.set_lambda(_lambda);
+    _rot_dyn_calib.add_sample(_q_p_dot_meas_red_filt,
+                              _q_p_ddot_meas_red_filt,
+                              _iq_meas_filt,
+                              _tau_meas_red_filt);
+
+//    _rot_dyn_calib.solve();
+
+//    _rot_dyn_calib.get_sol_millis(_jnt_cal_sol_millis);
+//    _rot_dyn_calib.get_opt_Kd0(_K_d0);
+//    _rot_dyn_calib.get_opt_Kd1(_K_d1);
+//    _rot_dyn_calib.get_opt_Kt(_K_t);
+//    _rot_dyn_calib.get_opt_rot_MoI(_rot_MoI);
+
+//    _rot_dyn_calib.get_tau_friction(_tau_friction);
+//    _rot_dyn_calib.get_alpha(_alpha_f0, _alpha_f1);
+//    _rot_dyn_calib.get_tau_motor(_tau_mot);
+//    _rot_dyn_calib.get_tau_inertial(_tau_inertial);
 
     // iq estimator, just to check calibration in simulation
 

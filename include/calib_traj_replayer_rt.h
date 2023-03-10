@@ -129,7 +129,6 @@ private:
                     _q_p_dot_meas,
                     _q_p_ddot_meas,
                     _tau_meas,
-                    _jnt_cal_sol_millis, _alpha_f0, _alpha_f1,
                     _K_d0, _K_d1, _rot_MoI, _K_t, _red_ratio,
                     _K_d0_ig, _K_d1_ig, _rot_MoI_ig, _K_t_ig,
                     _K_d0_nom, _K_d1_nom, _rot_MoI_nom, _K_t_nom,
@@ -142,6 +141,10 @@ private:
                     _q_p_dot_meas_red, _q_p_dot_meas_red_filt,
                     _q_p_ddot_meas_red, _q_p_ddot_meas_red_filt,
                     _tau_meas_red, _tau_meas_red_filt;
+
+    Eigen::VectorXd _jnt_cal_sol_millis,
+                    _alpha_f0, _alpha_f1,
+                    _tau_friction, _tau_mot, _tau_inertial;
 
     Eigen::VectorXd _lambda;
 
@@ -227,6 +230,8 @@ private:
     void pub_calib_status();
 
     void run_jnt_calib();
+
+    void apply_calib_mask();
 
     bool on_perform_traj_received(const concert_jnt_calib::PerformCalibTrajRequest& req,
                                   concert_jnt_calib::PerformCalibTrajResponse& res);
