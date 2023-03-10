@@ -89,7 +89,9 @@ private:
         _idle = true;
 
     int _n_jnts_robot,
-        _performed_traj_n = 0;
+        _performed_traj_n = 0,
+        _rot_calib_window_size = 10000,
+        _alpha = 5;
 
     std::string _dump_mat_suffix = "traj_replay",
                 _hw_type,
@@ -102,8 +104,9 @@ private:
         _matlogger_buffer_size = 1e5,
         _omega0_s = 0, _omegaf_s = 0, _t_exec_omega_s = 10.0, _q_ub_s = 0.0, _q_lb_s = 0.0,
         _q_temp, _q_dot_temp, _q_ddot_temp,
-        _sweep_min_t_exec = 0.5;
-
+        _sweep_min_t_exec = 0.5,
+        _lambda_qp_reg = 0.000001,
+        _q_dot_3sigma = 0.01;
 
     std::vector<std::string> _jnt_list;
     std::vector<int> _jnt_indxs;

@@ -174,7 +174,13 @@ void CalibTrajReplayerRt::get_params_from_config()
     _K_d0_nom = getParamOrThrow<Eigen::VectorXd>("~K_d0_nom");
     _K_d1_nom = getParamOrThrow<Eigen::VectorXd>("~K_d1_nom");
 
+    _red_ratio = getParamOrThrow<Eigen::VectorXd>("~red_ratio");
+
     _cal_mask = getParamOrThrow<std::vector<bool>>("~cal_mask");
+    _rot_calib_window_size = getParamOrThrow<int>("~rot_calib_window_size");
+    _lambda_qp_reg = getParamOrThrow<double>("~lambda_qp_reg");
+    _alpha = getParamOrThrow<int>("~alpha");
+    _q_dot_3sigma = getParamOrThrow<double>("~q_dot_3sigma");
 }
 
 void CalibTrajReplayerRt::is_sim(std::string sim_string = "sim")
@@ -739,6 +745,9 @@ bool CalibTrajReplayerRt::on_initialize()
     // numerical differentiation
     _num_diff = NumDiff(_n_jnts_robot, _plugin_dt, 1);
 
+    // actuator dynamics calibration
+
+//    _rot_dyn_calib =_ RotDynCal();
     return true;
     
 }
