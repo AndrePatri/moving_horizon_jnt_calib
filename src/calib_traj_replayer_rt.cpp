@@ -55,6 +55,26 @@ void CalibTrajReplayerRt::init_vars()
 
     _q_p_meas = Eigen::VectorXd::Zero(_n_jnts_robot);
     _q_p_dot_meas = Eigen::VectorXd::Zero(_n_jnts_robot);
+    _q_p_dot_meas_filt = Eigen::VectorXd::Zero(_n_jnts_robot);
+    _q_p_ddot_meas = Eigen::VectorXd::Zero(_n_jnts_robot);
+    _q_p_ddot_meas_filt = Eigen::VectorXd::Zero(_n_jnts_robot);
+    _tau_meas = Eigen::VectorXd::Zero(_n_jnts_robot);
+    _tau_meas_filt = Eigen::VectorXd::Zero(_n_jnts_robot);
+    _iq_meas = Eigen::VectorXd::Zero(_jnt_list.size());
+    _iq_meas_filt = Eigen::VectorXd::Zero(_jnt_list.size());
+
+    _jnt_cal_sol_millis = Eigen::VectorXd::Zero(_jnt_list.size());
+    _alpha_f0 = Eigen::VectorXd::Zero(_jnt_list.size());
+    _alpha_f1 = Eigen::VectorXd::Zero(_jnt_list.size());
+    _K_d0 = Eigen::VectorXd::Zero(_jnt_list.size());
+    _K_d1 = Eigen::VectorXd::Zero(_jnt_list.size());
+    _rot_MoI = Eigen::VectorXd::Zero(_jnt_list.size());
+    _K_t = Eigen::VectorXd::Zero(_jnt_list.size());
+    _red_ratio = Eigen::VectorXd::Zero(_jnt_list.size());
+    _K_d0_ig = Eigen::VectorXd::Zero(_jnt_list.size());
+    _K_d1_ig = Eigen::VectorXd::Zero(_jnt_list.size());
+    _rot_MoI_ig = Eigen::VectorXd::Zero(_jnt_list.size());
+    _K_t_ig = Eigen::VectorXd::Zero(_jnt_list.size());
 
     _q_p_safe_cmd = Eigen::VectorXd::Zero(_n_jnts_robot);
 
@@ -93,6 +113,20 @@ void CalibTrajReplayerRt::init_vars()
                                    _plugin_dt);
     }
 
+    _q_p_ddot_est_vect = std::vector<double>(_jnt_list.size());
+    _q_p_dot_meas_vect = std::vector<double>(_jnt_list.size());
+    _tau_meas_vect = std::vector<double>(_jnt_list.size());
+    _K_t_vect = std::vector<double>(_jnt_list.size());
+    _K_d0_vect = std::vector<double>(_jnt_list.size());
+    _K_d1_vect = std::vector<double>(_jnt_list.size());
+    _rot_MoI_vect = std::vector<double>(_jnt_list.size());
+    _red_ratio_vect = std::vector<double>(_jnt_list.size());
+    _alpha_f0_vect = std::vector<double>(_jnt_list.size());
+    _alpha_f1_vect = std::vector<double>(_jnt_list.size());
+    _iq_meas_vect = std::vector<double>(_jnt_list.size());
+    _jnt_cal_sol_millis_vect = std::vector<double>(_jnt_list.size());
+
+
 }
 
 void CalibTrajReplayerRt::get_params_from_config()
@@ -120,9 +154,22 @@ void CalibTrajReplayerRt::get_params_from_config()
     }
 
     _t_exec_omega_s = getParamOrThrow<double>("~t_exec_f");
-    _q_lb= getParamOrThrow<std::vector<double>>("~q_lb");
-    _q_ub= getParamOrThrow<std::vector<double>>("~q_ub");
+    _q_lb = getParamOrThrow<std::vector<double>>("~q_lb");
+    _q_ub = getParamOrThrow<std::vector<double>>("~q_ub");
 
+    _red_ratio = getParamOrThrow<Eigen::VectorXd>("~red_ratio");
+
+    _K_t = getParamOrThrow<Eigen::VectorXd>("~K_t");
+    _rot_MoI = getParamOrThrow<Eigen::VectorXd>("~rotor_MoI");
+    _K_d0 = getParamOrThrow<Eigen::VectorXd>("~K_d0");
+    _K_d1 = getParamOrThrow<Eigen::VectorXd>("~K_d1");
+
+    _K_t_ig = getParamOrThrow<Eigen::VectorXd>("~K_t_ig");
+    _rot_MoI_ig = getParamOrThrow<Eigen::VectorXd>("~rot_MoI_ig");
+    _K_d0_ig = getParamOrThrow<Eigen::VectorXd>("~K_d0_ig");
+    _K_d1_ig = getParamOrThrow<Eigen::VectorXd>("~K_d0_ig");
+
+    _cal_mask = getParamOrThrow<std::vector<bool>>("~cal_mask");
 }
 
 void CalibTrajReplayerRt::is_sim(std::string sim_string = "sim")
@@ -441,6 +488,44 @@ void CalibTrajReplayerRt::pub_replay_status()
     _traj_status_pub->publishLoaned(std::move(status_msg));
 }
 
+void CalibTrajReplayerRt::pub_calib_status()
+{
+    auto status_msg = _jnt_calib_pub->loanMessage();
+
+    status_msg->msg().jnt_names = _enbld_jnt_names;
+
+    for(int i = 0; i < _jnt_list.size(); i++)
+    {
+        _iq_meas_vect[i] = _iq_meas(i);
+        _q_p_dot_meas_vect[i] = _q_p_dot_meas_filt(_jnt_indxs[i]);
+        _q_p_ddot_est_vect[i] = _q_p_ddot_meas_filt(_jnt_indxs[i]);
+        _alpha_f0_vect[i] = _alpha_f0[i];
+        _alpha_f1_vect[i] = _alpha_f1[i];
+        _K_d0_vect[i] = _K_d0[i];
+        _K_d1_vect[i] = _K_d1[i];
+        _K_t_vect[i] = _K_t[i];
+        _rot_MoI_vect[i] = _rot_MoI[i];
+        _jnt_cal_sol_millis_vect[i] = _jnt_cal_sol_millis(i);
+
+    }
+
+    status_msg->msg().iq = _iq_meas_vect;
+    status_msg->msg().q_dot = _q_p_dot_meas_vect;
+    status_msg->msg().q_ddot = _q_p_ddot_est_vect;
+    status_msg->msg().alpha_f0 = _alpha_f0_vect;
+    status_msg->msg().alpha_f1 = _alpha_f1_vect;
+    status_msg->msg().K_d0_cal = _K_d0_vect;
+    status_msg->msg().K_d1_cal = _K_d1_vect;
+    status_msg->msg().K_t_cal = _K_t_vect;
+    status_msg->msg().rotor_MoI_cal = _rot_MoI_vect;
+    status_msg->msg().red_ratio = _red_ratio_vect;
+
+    status_msg->msg().sol_millis = _jnt_cal_sol_millis_vect;
+
+
+    _jnt_calib_pub->publishLoaned(std::move(status_msg));
+}
+
 bool CalibTrajReplayerRt::on_perform_traj_received(const concert_jnt_calib::PerformCalibTrajRequest& req,
                               concert_jnt_calib::PerformCalibTrajResponse& res)
 {
@@ -520,6 +605,16 @@ bool CalibTrajReplayerRt::on_perform_traj_received(const concert_jnt_calib::Perf
     res.success = success;
 
     return success;
+
+}
+
+bool CalibTrajReplayerRt::on_jnt_cal_received(const concert_jnt_calib::JntCalibRtRequest& req,
+                              concert_jnt_calib::JntCalibRtResponse& res)
+{
+
+    res.success = true;
+
+    return res.success;
 
 }
 
@@ -603,18 +698,24 @@ bool CalibTrajReplayerRt::on_initialize()
         throw std::invalid_argument(exception);
     }
 
-
     // initializing calibration-related stuff
 
-    _iq_getter = IqOutRosGetter(_enbld_jnt_names, _plugin_dt); // getter for quadrature current measurements from ros topic
+    _iq_getter = IqOutRosGetter(_jnt_list, _plugin_dt); // getter for quadrature current measurements from ros topic
 
     //filter for tau_meas
-    _mov_avrg_filter_tau = MovAvrgFilt(_n_jnts_robot, _plugin_dt, _mov_avrg_cutoff_freq_tau);
-    _mov_avrg_filter_tau.get_window_size(_mov_avrg_window_size_tau); // get computed window size
+    _mov_avrg_filter_tau = MovAvrgFilt(_n_jnts_robot, _plugin_dt, _mov_avrg_cutoff_freq);
+    _mov_avrg_filter_tau.get_window_size(_mov_avrg_window_size); // get computed window size
 
     //filter for q_dot
-    _mov_avrg_filter_q_dot = MovAvrgFilt(_n_jnts_robot, _plugin_dt, _mov_avrg_cutoff_freq_q_dot);
-    _mov_avrg_filter_tau.get_window_size(_mov_avrg_window_size_q_dot); // get computed window size
+    _mov_avrg_filter_q_dot = MovAvrgFilt(_n_jnts_robot, _plugin_dt, _mov_avrg_cutoff_freq);
+    _mov_avrg_filter_tau.get_window_size(_mov_avrg_window_size); // get computed window size
+
+    //filter for q_ddot
+    _mov_avrg_filter_q_ddot = MovAvrgFilt(_n_jnts_robot, _plugin_dt, _mov_avrg_cutoff_freq);
+    _mov_avrg_filter_q_ddot.get_window_size(_mov_avrg_window_size); // get computed window size
+
+    // numerical differentiation
+    _num_diff = NumDiff(_n_jnts_robot, _plugin_dt, 1);
 
     return true;
     
@@ -654,7 +755,10 @@ void CalibTrajReplayerRt::run()
         send_cmds(); // send commands to the robot
     }
 
+
     pub_replay_status(); // publishes info from the plugin to ros and internal xbot2 topics
+
+    pub_calib_status(); // publishes calibration status
 
     add_data2dump_logger(); // add data for debugging purposes
 

@@ -121,13 +121,35 @@ private:
     std::vector<double> _omega_k;
     std::vector<double> _time_ref;
 
-    Eigen::VectorXd _q_p_meas, _q_p_dot_meas, _tau_meas,
+    std::vector<bool> _cal_mask;
+
+    Eigen::VectorXd _q_p_meas,
+                    _q_p_dot_meas, _q_p_dot_meas_filt,
+                    _q_p_ddot_meas, _q_p_ddot_meas_filt,
+                    _tau_meas, _tau_meas_filt,
+                    _iq_meas, _iq_meas_filt,
+                    _jnt_cal_sol_millis, _alpha_f0, _alpha_f1,
+                    _K_d0, _K_d1, _rot_MoI, _K_t, _red_ratio,
+                    _K_d0_ig, _K_d1_ig, _rot_MoI_ig, _K_t_ig,
                     _q_p_cmd, _q_p_dot_cmd, _q_p_ddot_cmd,
                     _q_p_safe_cmd,
                     _q_min, _q_max, _q_dot_lim,
                     _q_p_init_appr_traj, _q_p_trgt_appr_traj;
 
     std::vector<double> _q_p_cmd_vect, _q_p_dot_cmd_vect, _q_p_ddot_cmd_vect;
+
+    std::vector<double> _q_p_ddot_est_vect,
+                        _q_p_dot_meas_vect,
+                        _tau_meas_vect,
+                        _K_t_vect,
+                        _K_d0_vect,
+                        _K_d1_vect,
+                        _rot_MoI_vect,
+                        _red_ratio_vect,
+                        _alpha_f0_vect,
+                        _alpha_f1_vect,
+                        _iq_meas_vect,
+                        _jnt_cal_sol_millis_vect;
 
     PeisekahTrans _peisekah_utils;
 
@@ -152,10 +174,11 @@ private:
 
     MovAvrgFilt _mov_avrg_filter_tau;
     MovAvrgFilt _mov_avrg_filter_q_dot;
-    int _mov_avrg_window_size_tau = 10;
-    double _mov_avrg_cutoff_freq_tau = 15.0;
-    int _mov_avrg_window_size_q_dot= 10;
-    double _mov_avrg_cutoff_freq_q_dot = 15.0;
+    MovAvrgFilt _mov_avrg_filter_q_ddot;
+    int _mov_avrg_window_size = 10;
+    double _mov_avrg_cutoff_freq= 15.0;
+
+    NumDiff _num_diff;
 
     void get_params_from_config();
 
@@ -188,6 +211,8 @@ private:
 
     void pub_replay_status();
     void pub_calib_status();
+
+    void run_jnt_calib();
 
     bool on_perform_traj_received(const concert_jnt_calib::PerformCalibTrajRequest& req,
                                   concert_jnt_calib::PerformCalibTrajResponse& res);
