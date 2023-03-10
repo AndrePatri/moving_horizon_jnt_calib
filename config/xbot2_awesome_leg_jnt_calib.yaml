@@ -50,7 +50,7 @@ xbotcore_plugins:
             alpha: {value: 5, type: int}
             q_dot_3sigma: {value: 0.01, type: double}
             cal_mask: {value: [false, true, true, false], type: vector<bool>} # which components of rotor's dynamics to calibrate: [K_t, K_d0, K_d1, rot_MoI]
-            lambda: {value: [0.001, 0.02], type: Eigen::VectorXd}
+            lambda: {value: [0.001, 0.001, 0.001, 0.001], type: Eigen::VectorXd}
 
             red_ratio: {value: [0.02, 0.02], type: Eigen::VectorXd}  # gear reduction ratio of the actuator (always <=1)
             K_t: {value: [0.045, 0.045], type: Eigen::VectorXd} # torque constants ([Nm/A])
