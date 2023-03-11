@@ -564,7 +564,7 @@ void CalibTrajReplayerRt::pub_calib_status()
 
     for(int i = 0; i < _jnt_list.size(); i++)
     {
-        _iq_meas_vect[i] = _iq_meas(i);
+        _iq_meas_vect[i] = _iq_meas_filt(i);
         _q_p_dot_meas_vect[i] = _q_p_dot_meas_red_filt(i);
         _q_p_ddot_est_vect[i] = _q_p_ddot_meas_red_filt(i);
         _tau_meas_vect[i] = _tau_meas_red_filt(i);
