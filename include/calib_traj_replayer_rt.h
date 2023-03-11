@@ -230,6 +230,7 @@ private:
     void pub_calib_status();
 
     void run_jnt_calib();
+    void get_calib_data();
 
     void apply_calib_mask();
 

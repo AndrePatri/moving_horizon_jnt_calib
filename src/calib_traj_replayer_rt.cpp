@@ -687,6 +687,34 @@ bool CalibTrajReplayerRt::on_jnt_cal_received(const moving_horizon_jnt_calib::Jn
 void CalibTrajReplayerRt::run_jnt_calib()
 {
 
+    _rot_dyn_calib.set_lambda(_lambda); // setting latest available regularization
+
+    apply_calib_mask(); // we first apply the calibration mask, just in case the mask
+    // was changed externally
+
+    _rot_dyn_calib.add_sample(_q_p_dot_meas_red_filt,
+                              _q_p_ddot_meas_red_filt,
+                              _iq_meas_filt,
+                              _tau_meas_red_filt); // adding latest state for calibration
+
+
+    _rot_dyn_calib.solve();
+
+
+}
+
+void CalibTrajReplayerRt::get_calib_data()
+{
+    _rot_dyn_calib.get_sol_millis(_jnt_cal_sol_millis);
+    _rot_dyn_calib.get_opt_Kd0(_K_d0);
+    _rot_dyn_calib.get_opt_Kd1(_K_d1);
+    _rot_dyn_calib.get_opt_Kt(_K_t);
+    _rot_dyn_calib.get_opt_rot_MoI(_rot_MoI);
+
+    _rot_dyn_calib.get_tau_friction(_tau_friction);
+    _rot_dyn_calib.get_alpha(_alpha_f0, _alpha_f1);
+    _rot_dyn_calib.get_tau_motor(_tau_mot);
+    _rot_dyn_calib.get_tau_inertial(_tau_inertial);
 }
 
 void CalibTrajReplayerRt::apply_calib_mask()
@@ -843,26 +871,6 @@ bool CalibTrajReplayerRt::on_initialize()
                                 _q_dot_3sigma,
                                 _verbose);
 
-    apply_calib_mask();
-    _rot_dyn_calib.set_lambda(_lambda);
-    _rot_dyn_calib.add_sample(_q_p_dot_meas_red_filt,
-                              _q_p_ddot_meas_red_filt,
-                              _iq_meas_filt,
-                              _tau_meas_red_filt);
-
-    _rot_dyn_calib.solve();
-
-    _rot_dyn_calib.get_sol_millis(_jnt_cal_sol_millis);
-    _rot_dyn_calib.get_opt_Kd0(_K_d0);
-    _rot_dyn_calib.get_opt_Kd1(_K_d1);
-    _rot_dyn_calib.get_opt_Kt(_K_t);
-    _rot_dyn_calib.get_opt_rot_MoI(_rot_MoI);
-
-    _rot_dyn_calib.get_tau_friction(_tau_friction);
-    _rot_dyn_calib.get_alpha(_alpha_f0, _alpha_f1);
-    _rot_dyn_calib.get_tau_motor(_tau_mot);
-    _rot_dyn_calib.get_tau_inertial(_tau_inertial);
-
     // iq estimator, just to check calibration in simulation
 
     _iq_estimator = IqEstimator(_K_t_nom,
@@ -909,6 +917,8 @@ void CalibTrajReplayerRt::run()
         send_cmds(); // send commands to the robot
     }
 
+    run_jnt_calib(); // run moving horizon joint estimation
+    get_calib_data(); // getting calibration data
 
     pub_replay_status(); // publishes info from the plugin to ros and internal xbot2 topics
 
