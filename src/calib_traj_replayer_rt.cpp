@@ -69,8 +69,10 @@ void CalibTrajReplayerRt::init_vars()
     _tau_meas_red_filt = Eigen::VectorXd::Zero(_jnt_list.size());
 
     _jnt_cal_sol_millis = Eigen::VectorXd::Zero(_jnt_list.size());
-    _alpha_f0 = Eigen::VectorXd::Zero(_jnt_list.size());
-    _alpha_f1 = Eigen::VectorXd::Zero(_jnt_list.size());
+    _alpha_d0 = Eigen::VectorXd::Zero(_jnt_list.size());
+    _alpha_d1 = Eigen::VectorXd::Zero(_jnt_list.size());
+    _alpha_inertial = Eigen::VectorXd::Zero(_jnt_list.size());
+    _alpha_kt = Eigen::VectorXd::Zero(_jnt_list.size());
     _tau_friction = Eigen::VectorXd::Zero(_jnt_list.size());
     _tau_mot = Eigen::VectorXd::Zero(_jnt_list.size());
     _tau_inertial = Eigen::VectorXd::Zero(_jnt_list.size());
@@ -128,8 +130,10 @@ void CalibTrajReplayerRt::init_vars()
     _K_d1_vect = std::vector<double>(_jnt_list.size());
     _rot_MoI_vect = std::vector<double>(_jnt_list.size());
     _red_ratio_vect = std::vector<double>(_jnt_list.size());
-    _alpha_f0_vect = std::vector<double>(_jnt_list.size());
-    _alpha_f1_vect = std::vector<double>(_jnt_list.size());
+    _alpha_d0_vect = std::vector<double>(_jnt_list.size());
+    _alpha_d1_vect = std::vector<double>(_jnt_list.size());
+    _alpha_inertial_vect = std::vector<double>(_jnt_list.size());
+    _alpha_kt_vect = std::vector<double>(_jnt_list.size());
     _iq_meas_vect = std::vector<double>(_jnt_list.size());
     _jnt_cal_sol_millis_vect = std::vector<double>(_jnt_list.size());
 
@@ -564,8 +568,10 @@ void CalibTrajReplayerRt::pub_calib_status()
         _q_p_dot_meas_vect[i] = _q_p_dot_meas_red_filt(i);
         _q_p_ddot_est_vect[i] = _q_p_ddot_meas_red_filt(i);
         _tau_meas_vect[i] = _tau_meas_red_filt(i);
-        _alpha_f0_vect[i] = _alpha_f0[i];
-        _alpha_f1_vect[i] = _alpha_f1[i];
+        _alpha_d0_vect[i] = _alpha_d0[i];
+        _alpha_d1_vect[i] = _alpha_d1[i];
+        _alpha_inertial_vect[i] = _alpha_inertial[i];
+        _alpha_kt_vect[i] = _alpha_kt[i];
         _K_d0_vect[i] = _K_d0[i];
         _K_d1_vect[i] = _K_d1[i];
         _K_t_vect[i] = _K_t[i];
@@ -577,8 +583,11 @@ void CalibTrajReplayerRt::pub_calib_status()
     status_msg->msg().iq = _iq_meas_vect;
     status_msg->msg().q_dot = _q_p_dot_meas_vect;
     status_msg->msg().q_ddot = _q_p_ddot_est_vect;
-    status_msg->msg().alpha_f0 = _alpha_f0_vect;
-    status_msg->msg().alpha_f1 = _alpha_f1_vect;
+    status_msg->msg().alpha_d0 = _alpha_d0_vect;
+    status_msg->msg().alpha_d1 = _alpha_d1_vect;
+    status_msg->msg().alpha_inertial = _alpha_inertial_vect;
+    status_msg->msg().alpha_kt = _alpha_kt_vect;
+
     status_msg->msg().K_d0_cal = _K_d0_vect;
     status_msg->msg().K_d1_cal = _K_d1_vect;
     status_msg->msg().K_t_cal = _K_t_vect;
@@ -712,7 +721,9 @@ void CalibTrajReplayerRt::get_calib_data()
     _rot_dyn_calib.get_opt_rot_MoI(_rot_MoI);
 
     _rot_dyn_calib.get_tau_friction(_tau_friction);
-    _rot_dyn_calib.get_alpha(_alpha_f0, _alpha_f1);
+    _rot_dyn_calib.get_alpha_d(_alpha_d0, _alpha_d1);
+    _rot_dyn_calib.get_alpha_inertial(_alpha_inertial);
+    _rot_dyn_calib.get_alpha_kt(_alpha_kt);
     _rot_dyn_calib.get_tau_motor(_tau_mot);
     _rot_dyn_calib.get_tau_inertial(_tau_inertial);
 }

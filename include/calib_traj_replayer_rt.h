@@ -143,7 +143,7 @@ private:
                     _tau_meas_red, _tau_meas_red_filt;
 
     Eigen::VectorXd _jnt_cal_sol_millis,
-                    _alpha_f0, _alpha_f1,
+                    _alpha_d0, _alpha_d1, _alpha_inertial, _alpha_kt,
                     _tau_friction, _tau_mot, _tau_inertial;
 
     Eigen::VectorXd _lambda;
@@ -158,8 +158,10 @@ private:
                         _K_d1_vect,
                         _rot_MoI_vect,
                         _red_ratio_vect,
-                        _alpha_f0_vect,
-                        _alpha_f1_vect,
+                        _alpha_d0_vect,
+                        _alpha_d1_vect,
+                        _alpha_inertial_vect,
+                        _alpha_kt_vect,
                         _iq_meas_vect,
                         _jnt_cal_sol_millis_vect;
 
