@@ -850,18 +850,18 @@ bool CalibTrajReplayerRt::on_initialize()
                               _iq_meas_filt,
                               _tau_meas_red_filt);
 
-//    _rot_dyn_calib.solve();
+    _rot_dyn_calib.solve();
 
-//    _rot_dyn_calib.get_sol_millis(_jnt_cal_sol_millis);
-//    _rot_dyn_calib.get_opt_Kd0(_K_d0);
-//    _rot_dyn_calib.get_opt_Kd1(_K_d1);
-//    _rot_dyn_calib.get_opt_Kt(_K_t);
-//    _rot_dyn_calib.get_opt_rot_MoI(_rot_MoI);
+    _rot_dyn_calib.get_sol_millis(_jnt_cal_sol_millis);
+    _rot_dyn_calib.get_opt_Kd0(_K_d0);
+    _rot_dyn_calib.get_opt_Kd1(_K_d1);
+    _rot_dyn_calib.get_opt_Kt(_K_t);
+    _rot_dyn_calib.get_opt_rot_MoI(_rot_MoI);
 
-//    _rot_dyn_calib.get_tau_friction(_tau_friction);
-//    _rot_dyn_calib.get_alpha(_alpha_f0, _alpha_f1);
-//    _rot_dyn_calib.get_tau_motor(_tau_mot);
-//    _rot_dyn_calib.get_tau_inertial(_tau_inertial);
+    _rot_dyn_calib.get_tau_friction(_tau_friction);
+    _rot_dyn_calib.get_alpha(_alpha_f0, _alpha_f1);
+    _rot_dyn_calib.get_tau_motor(_tau_mot);
+    _rot_dyn_calib.get_tau_inertial(_tau_inertial);
 
     // iq estimator, just to check calibration in simulation
 
