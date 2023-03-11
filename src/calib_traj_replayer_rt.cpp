@@ -136,6 +136,8 @@ void CalibTrajReplayerRt::init_vars()
     _iq_meas_vect = std::vector<double>(_jnt_list.size());
     _jnt_cal_sol_millis_vect = std::vector<double>(_jnt_list.size());
 
+    _cal_mask_ros = std::vector<uint8_t>(4);
+
 
 }
 
@@ -598,6 +600,13 @@ void CalibTrajReplayerRt::pub_calib_status()
 
     status_msg->msg().sol_millis = _jnt_cal_sol_millis_vect;
 
+    for(int i = 0; i < 4; i++)
+    {
+        _cal_mask_ros[i] = _cal_mask[i];
+
+    }
+
+    status_msg->msg().cal_mask = _cal_mask_ros;
 
     _jnt_calib_pub->publishLoaned(std::move(status_msg));
 }

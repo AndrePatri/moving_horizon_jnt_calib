@@ -124,6 +124,7 @@ private:
     std::vector<double> _time_ref;
 
     std::vector<bool> _cal_mask;
+    std::vector<uint8_t> _cal_mask_ros;
 
     Eigen::VectorXd _q_p_meas,
                     _q_p_dot_meas,
