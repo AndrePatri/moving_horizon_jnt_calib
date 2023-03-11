@@ -81,7 +81,6 @@ void CalibTrajReplayerRt::init_vars()
     _K_d1 = Eigen::VectorXd::Zero(_jnt_list.size());
     _rot_MoI = Eigen::VectorXd::Zero(_jnt_list.size());
     _K_t = Eigen::VectorXd::Zero(_jnt_list.size());
-    _red_ratio = Eigen::VectorXd::Zero(_jnt_list.size());
     _K_d0_ig = Eigen::VectorXd::Zero(_jnt_list.size());
     _K_d1_ig = Eigen::VectorXd::Zero(_jnt_list.size());
     _rot_MoI_ig = Eigen::VectorXd::Zero(_jnt_list.size());
@@ -236,6 +235,7 @@ void CalibTrajReplayerRt::is_dummy(std::string dummy_string = "dummy")
 void CalibTrajReplayerRt::update_state()
 {    
     // "sensing" the robot
+
     _robot->sense();
 
     // Getting robot state
@@ -285,8 +285,6 @@ void CalibTrajReplayerRt::update_iq_estimation()
 {
 
     _iq_estimator.set_current_state(_q_p_dot_meas_red_filt, _q_p_ddot_meas_red_filt, _tau_meas_red_filt);
-
-    _iq_estimator.update();
 
     _iq_estimator.get_iq_estimate(_iq_meas_filt);
 
