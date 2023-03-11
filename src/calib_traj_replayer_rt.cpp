@@ -266,6 +266,8 @@ void CalibTrajReplayerRt::update_state()
 
         _iq_getter.get_last_iq_out(_iq_meas); // raw
 
+        _iq_getter.get_last_iq_out_filt(_iq_meas_filt); // filtered
+
     }
 
     // filtering data (all with same frequency)
@@ -277,8 +279,6 @@ void CalibTrajReplayerRt::update_state()
     _mov_avrg_filter_q_ddot.get(_q_p_ddot_meas_red_filt);
     _mov_avrg_filter_tau.get(_tau_meas_red_filt);
 
-    _iq_getter.get_last_iq_out_filt(_iq_meas_filt); // filtered
-
 }
 
 void CalibTrajReplayerRt::update_iq_estimation()
@@ -286,7 +286,7 @@ void CalibTrajReplayerRt::update_iq_estimation()
 
     _iq_estimator.set_current_state(_q_p_dot_meas_red_filt, _q_p_ddot_meas_red_filt, _tau_meas_red_filt);
 
-    _iq_estimator.get_iq_estimate(_iq_meas);
+    _iq_estimator.get_iq_estimate(_iq_meas_filt);
 
 }
 
