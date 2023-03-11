@@ -286,6 +286,8 @@ void CalibTrajReplayerRt::update_iq_estimation()
 
     _iq_estimator.set_current_state(_q_p_dot_meas_red_filt, _q_p_ddot_meas_red_filt, _tau_meas_red_filt);
 
+    _iq_estimator.update();
+
     _iq_estimator.get_iq_estimate(_iq_meas_filt);
 
 }
@@ -583,6 +585,8 @@ void CalibTrajReplayerRt::pub_calib_status()
     status_msg->msg().iq = _iq_meas_vect;
     status_msg->msg().q_dot = _q_p_dot_meas_vect;
     status_msg->msg().q_ddot = _q_p_ddot_est_vect;
+    status_msg->msg().tau = _tau_meas_vect;
+
     status_msg->msg().alpha_d0 = _alpha_d0_vect;
     status_msg->msg().alpha_d1 = _alpha_d1_vect;
     status_msg->msg().alpha_inertial = _alpha_inertial_vect;
@@ -889,7 +893,8 @@ bool CalibTrajReplayerRt::on_initialize()
                                 _rot_MoI_nom,
                                 _red_ratio,
                                 _alpha,
-                                _q_dot_3sigma); // object to compute iq estimate
+                                _q_dot_3sigma,
+                                false); // object to compute iq estimate
     return true;
     
 }
