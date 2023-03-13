@@ -52,9 +52,8 @@ target_link_libraries(start_calib_traj PRIVATE awesome_utils::awesome_utils xbot
 install(
     TARGETS
     calib_traj_replayer_rt
-    start_calib_traj
     DESTINATION lib
 )
 
-install(TARGETS calib_logger DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
+install(TARGETS calib_logger start_calib_traj DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 install(PROGRAMS src/launch_rosbag.sh DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
