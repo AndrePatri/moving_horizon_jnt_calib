@@ -808,14 +808,6 @@ void CalibTrajReplayerRt::get_calib_data()
     // the last obtained solution (if the parameter is inactive,
     // its ig will be overwritten by the call to apply_calib_mask())
 
-    if(_set_ig_to_prev_sol)
-    {
-        _K_t_ig = _K_t;
-        _K_d0_ig = _K_d0;
-        _K_d1_ig = _K_d1;
-        _rot_MoI_ig = _rot_MoI;
-    }
-
 }
 
 void CalibTrajReplayerRt::apply_calib_mask()
@@ -1032,6 +1024,14 @@ void CalibTrajReplayerRt::run()
     if (_is_first_run)
     { // next control loops are aware that it is not the first control loop
         _is_first_run = !_is_first_run;
+    }
+
+    if(_set_ig_to_prev_sol)
+    {
+        _K_t_ig = _K_t;
+        _K_d0_ig = _K_d0;
+        _K_d1_ig = _K_d1;
+        _rot_MoI_ig = _rot_MoI;
     }
 
 }
