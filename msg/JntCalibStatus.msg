@@ -16,6 +16,8 @@ float64[] rotor_MoI_cal
 
 float64[] sol_millis
 
-string[] jnt_names
+float64[] lambda
 
 bool[] cal_mask
+
+string[] jnt_names

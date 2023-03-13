@@ -33,15 +33,9 @@ xbotcore_plugins:
 
             verbose: {value: false, type: bool}
 
-            traj_execution_time: {value: 300.0, type: double}
-
             approach_traj_exec_time: {value: 10.0, type: double}
 
-            jnt_list: {value: ["hip_pitch_1", "knee_pitch_1"], type: vector<string>} # joints to be calibrated
-
-            q_ub: {value: [2.0, -2.0], type: vector<double>}
-            q_lb: {value: [-2.0, 2.0], type: vector<double>}
-
+            traj_execution_time: {value: 300.0, type: double}
             f0: {value: 0.1, type: double} # initial freq value for sweep calibration traj.
             ff: {value: 0.3, type: double} # final freq value for sweep calibration traj.
             t_exec_f: {value: 10.0, type: double} # time to ramp from f0 to ff
@@ -50,23 +44,44 @@ xbotcore_plugins:
             alpha: {value: 5, type: int}
             q_dot_3sigma: {value: 0.01, type: double}
             cal_mask: {value: [true, false, false, false], type: vector<bool>} # which components of rotor's dynamics to calibrate: [K_t, K_d0, K_d1, rot_MoI]
-            lambda: {value: [0.001, 0.001, 0.001, 0.001], type: Eigen::VectorXd}
+            lambda: {value: [0.1, 0.1, 0.1, 0.1], type: Eigen::VectorXd}
+            mov_avrg_cutoff_freq: {value: 10.0, type: double} # [Hz]
 
-            red_ratio: {value: [0.02, 0.02], type: Eigen::VectorXd}  # gear reduction ratio of the actuator (always <=1)
-            K_t: {value: [0.045, 0.045], type: Eigen::VectorXd} # torque constants ([Nm/A])
-            rotor_MoI: {value: [6.5717708e-5, 6.5717708e-5], type: Eigen::VectorXd}  # axial moment of inertia of the rotor ([Kg m^2]); real value 6.5717708e-5
-            K_d0: {value: [0.0, 0.0], type: Eigen::VectorXd}
-            K_d1: {value: [0.0, 0.0], type: Eigen::VectorXd}
+#            jnt_list: {value: ["hip_pitch_1", "knee_pitch_1"], type: vector<string>} # joints to be calibrated
 
-            K_t_ig: {value: [0.045, 0.045], type: Eigen::VectorXd}
-            rot_MoI_ig: {value: [6.5717708e-5, 6.57177086e-5], type: Eigen::VectorXd}
-            K_d0_ig: {value: [0.0, 0.0], type: Eigen::VectorXd} # initial guess for the static friction torque coefficient ( tau_d0 = K_d* sign(joint_vel) )
-            K_d1_ig: {value: [0.0, 0.0], type: Eigen::VectorXd} # initial guess for the dynamical friction torque coefficient ( tau_d1 = K_d* joint_vel )
+#            q_ub: {value: [2.0, -2.0], type: vector<double>}
+#            q_lb: {value: [-2.0, 2.0], type: vector<double>}
 
-            K_t_nom: {value: [0.045, 0.045], type: Eigen::VectorXd}
-            rot_MoI_nom: {value: [6.5717708e-5, 6.57177086e-5], type: Eigen::VectorXd}
-            K_d0_nom: {value: [3.24, 10.72], type: Eigen::VectorXd} # initial guess for the static friction torque coefficient ( tau_d0 = K_d* sign(joint_vel) )
-            K_d1_nom: {value: [1.45, 1.77], type: Eigen::VectorXd} # initial guess for the dynamical friction torque coefficient ( tau_d1 = K_d* joint_vel )
+#            red_ratio: {value: [0.02, 0.02], type: Eigen::VectorXd}  # gear reduction ratio of the actuator (always <=1)
+#            K_t: {value: [0.045, 0.045], type: Eigen::VectorXd} # torque constants ([Nm/A])
+#            rotor_MoI: {value: [6.5717708e-5, 6.5717708e-5], type: Eigen::VectorXd}  # axial moment of inertia of the rotor ([Kg m^2]); real value 6.5717708e-5
+#            K_d0: {value: [0.0, 0.0], type: Eigen::VectorXd}
+#            K_d1: {value: [0.0, 0.0], type: Eigen::VectorXd}
+
+#            K_t_ig: {value: [0.045, 0.045], type: Eigen::VectorXd}
+#            rot_MoI_ig: {value: [6.5717708e-5, 6.57177086e-5], type: Eigen::VectorXd}
+#            K_d0_ig: {value: [0.0, 0.0], type: Eigen::VectorXd} # initial guess for the static friction torque coefficient ( tau_d0 = K_d* sign(joint_vel) )
+#            K_d1_ig: {value: [0.0, 0.0], type: Eigen::VectorXd} # initial guess for the dynamical friction torque coefficient ( tau_d1 = K_d* joint_vel )
+
+#            K_t_nom: {value: [0.045, 0.045], type: Eigen::VectorXd}
+#            rot_MoI_nom: {value: [6.5717708e-5, 6.57177086e-5], type: Eigen::VectorXd}
+#            K_d0_nom: {value: [3.24, 10.72], type: Eigen::VectorXd} # initial guess for the static friction torque coefficient ( tau_d0 = K_d* sign(joint_vel) )
+#            K_d1_nom: {value: [1.45, 1.77], type: Eigen::VectorXd} # initial guess for the dynamical friction torque coefficient ( tau_d1 = K_d* joint_vel )
+
+            jnt_list: {value: ["knee_pitch_1"], type: vector<string>} # joints to be calibrated
+
+            q_ub: {value: [-2.0], type: vector<double>}
+            q_lb: {value: [2.0], type: vector<double>}
+
+            red_ratio: {value: [0.02], type: Eigen::VectorXd}  # gear reduction ratio of the actuator (always <=1)
+            K_t_ig: {value: [0.045], type: Eigen::VectorXd}
+            rot_MoI_ig: {value: [6.57177086e-5], type: Eigen::VectorXd}
+            K_d0_ig: {value: [0.0], type: Eigen::VectorXd} # initial guess for the static friction torque coefficient ( tau_d0 = K_d* sign(joint_vel) )
+            K_d1_ig: {value: [0.0], type: Eigen::VectorXd} # initial guess for the dynamical friction torque coefficient ( tau_d1 = K_d* joint_vel )
+            K_t_nom: {value: [0.045], type: Eigen::VectorXd}
+            rot_MoI_nom: {value: [6.57177086e-5], type: Eigen::VectorXd}
+            K_d0_nom: {value: [10.72], type: Eigen::VectorXd} # initial guess for the static friction torque coefficient ( tau_d0 = K_d* sign(joint_vel) )
+            K_d1_nom: {value: [1.77], type: Eigen::VectorXd} # initial guess for the dynamical friction torque coefficient ( tau_d1 = K_d* joint_vel )
 
 
 # global parameters

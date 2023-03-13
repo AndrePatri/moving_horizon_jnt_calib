@@ -200,6 +200,7 @@ private:
     NumDiff _num_diff;
 
     void get_params_from_config();
+    void param_dims_ok_or_throw();
 
     void init_vars();
     void init_clocks();

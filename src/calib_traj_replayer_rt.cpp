@@ -81,10 +81,6 @@ void CalibTrajReplayerRt::init_vars()
     _K_d1 = Eigen::VectorXd::Zero(_jnt_list.size());
     _rot_MoI = Eigen::VectorXd::Zero(_jnt_list.size());
     _K_t = Eigen::VectorXd::Zero(_jnt_list.size());
-    _K_d0_ig = Eigen::VectorXd::Zero(_jnt_list.size());
-    _K_d1_ig = Eigen::VectorXd::Zero(_jnt_list.size());
-    _rot_MoI_ig = Eigen::VectorXd::Zero(_jnt_list.size());
-    _K_t_ig = Eigen::VectorXd::Zero(_jnt_list.size());
 
     _q_p_cmd_vect = std::vector<double>(_n_jnts_robot);
     _q_p_dot_cmd_vect = std::vector<double>(_n_jnts_robot);
@@ -169,30 +165,44 @@ void CalibTrajReplayerRt::get_params_from_config()
     _q_lb = getParamOrThrow<std::vector<double>>("~q_lb");
     _q_ub = getParamOrThrow<std::vector<double>>("~q_ub");
 
-    _red_ratio = getParamOrThrow<Eigen::VectorXd>("~red_ratio");
-
-    _K_t = getParamOrThrow<Eigen::VectorXd>("~K_t");
-    _rot_MoI = getParamOrThrow<Eigen::VectorXd>("~rotor_MoI");
-    _K_d0 = getParamOrThrow<Eigen::VectorXd>("~K_d0");
-    _K_d1 = getParamOrThrow<Eigen::VectorXd>("~K_d1");
-
-    _K_t_ig = getParamOrThrow<Eigen::VectorXd>("~K_t_ig");
-    _rot_MoI_ig = getParamOrThrow<Eigen::VectorXd>("~rot_MoI_ig");
-    _K_d0_ig = getParamOrThrow<Eigen::VectorXd>("~K_d0_ig");
-    _K_d1_ig = getParamOrThrow<Eigen::VectorXd>("~K_d1_ig");
-
-    _K_t_nom = getParamOrThrow<Eigen::VectorXd>("~K_t_nom");
-    _rot_MoI_nom = getParamOrThrow<Eigen::VectorXd>("~rot_MoI_nom");
-    _K_d0_nom = getParamOrThrow<Eigen::VectorXd>("~K_d0_nom");
-    _K_d1_nom = getParamOrThrow<Eigen::VectorXd>("~K_d1_nom");
-
-    _red_ratio = getParamOrThrow<Eigen::VectorXd>("~red_ratio");
-
     _cal_mask = getParamOrThrow<std::vector<bool>>("~cal_mask");
     _rot_calib_window_size = getParamOrThrow<int>("~rot_calib_window_size");
     _lambda = getParamOrThrow<Eigen::VectorXd>("~lambda");
     _alpha = getParamOrThrow<int>("~alpha");
     _q_dot_3sigma = getParamOrThrow<double>("~q_dot_3sigma");
+    _mov_avrg_cutoff_freq = getParamOrThrow<double>("~mov_avrg_cutoff_freq");
+
+    _red_ratio = getParamOrThrow<Eigen::VectorXd>("~red_ratio");
+    _K_t_ig = getParamOrThrow<Eigen::VectorXd>("~K_t_ig");
+    _rot_MoI_ig = getParamOrThrow<Eigen::VectorXd>("~rot_MoI_ig");
+    _K_d0_ig = getParamOrThrow<Eigen::VectorXd>("~K_d0_ig");
+    _K_d1_ig = getParamOrThrow<Eigen::VectorXd>("~K_d1_ig");
+    _K_t_nom = getParamOrThrow<Eigen::VectorXd>("~K_t_nom");
+    _rot_MoI_nom = getParamOrThrow<Eigen::VectorXd>("~rot_MoI_nom");
+    _K_d0_nom = getParamOrThrow<Eigen::VectorXd>("~K_d0_nom");
+    _K_d1_nom = getParamOrThrow<Eigen::VectorXd>("~K_d1_nom");
+
+    param_dims_ok_or_throw();
+}
+
+void CalibTrajReplayerRt::param_dims_ok_or_throw()
+{
+
+    if((_red_ratio.size() != _K_t_ig.size()) ||
+       (_K_t_ig.size() != _rot_MoI_ig.size()) ||
+       (_rot_MoI_ig.size() != _K_d0_ig.size()) ||
+       (_K_d0_ig.size() != _K_d1_ig.size()) ||
+       (_K_d1_ig.size() != _K_t_nom.size()) ||
+       (_K_t_nom.size() != _rot_MoI_nom.size()) ||
+       (_rot_MoI_nom.size() != _K_d0_nom.size()) ||
+       (_K_d0_nom.size() != _K_d1_nom.size()) ||
+       (_K_d1_nom.size() !=_jnt_list.size()))
+    {
+        std::string exception = std::string("Dimension mismatch in YAML parameters. Check the XBot2 config file for errors! "
+                                            "All dimensions should be coherent with the provided calibration jnt_list\n");
+
+        throw std::invalid_argument(exception);
+    }
 }
 
 void CalibTrajReplayerRt::is_sim(std::string sim_string = "sim")
@@ -562,7 +572,7 @@ void CalibTrajReplayerRt::pub_calib_status()
 {
     auto status_msg = _jnt_calib_pub->loanMessage();
 
-    status_msg->msg().jnt_names = _enbld_jnt_names;
+    status_msg->msg().jnt_names = _jnt_list;
 
     for(int i = 0; i < _jnt_list.size(); i++)
     {
