@@ -664,6 +664,9 @@ void CalibTrajReplayerRt::pub_calib_status()
     status_msg->msg().cal_mask = _cal_mask_ros;
     status_msg->msg().cal_mask_des = _cal_mask_des_ros;
 
+    status_msg->msg().lambda_des = _lambda_des_vect;
+    status_msg->msg().lambda = _lambda_vect;
+
     _jnt_calib_pub->publishLoaned(std::move(status_msg));
 }
 
