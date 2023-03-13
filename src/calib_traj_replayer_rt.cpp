@@ -822,7 +822,7 @@ void CalibTrajReplayerRt::apply_calib_mask()
 {
     _rot_dyn_calib.set_solution_mask(_cal_mask_des);
 
-    if(_cal_mask_des[0] = false)
+    if(!_cal_mask_des[0])
     { // Kt
         _rot_dyn_calib.set_ig_Kt(_K_t_nom);
     }
@@ -830,7 +830,7 @@ void CalibTrajReplayerRt::apply_calib_mask()
     {
         _rot_dyn_calib.set_ig_Kt(_K_t_ig);
     }
-    if(_cal_mask_des[1] = false)
+    if(!_cal_mask_des[1])
     { // Kd0
         _rot_dyn_calib.set_ig_Kd0(_K_d0_nom);
     }
@@ -839,7 +839,7 @@ void CalibTrajReplayerRt::apply_calib_mask()
         _rot_dyn_calib.set_ig_Kd0(_K_d0_ig);
     }
 
-    if(_cal_mask_des[2] = false)
+    if(!_cal_mask_des[2])
     { // Kd1
         _rot_dyn_calib.set_ig_Kd1(_K_d1_nom);
     }
@@ -848,7 +848,7 @@ void CalibTrajReplayerRt::apply_calib_mask()
         _rot_dyn_calib.set_ig_Kd1(_K_d1_ig);
 
     }
-    if(_cal_mask_des[3] = false)
+    if(!_cal_mask_des[3])
     { // rot_MoI
         _rot_dyn_calib.set_ig_MoI(_rot_MoI_nom);
     }
