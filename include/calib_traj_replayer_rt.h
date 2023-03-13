@@ -87,7 +87,8 @@ private:
         _go2calib_traj = false, _approach_traj_started = false, _approach_traj_finished = false,
         _perform_traj = false, _traj_started = false, _traj_finished = false,
         _idle = true,
-        _set_ig_to_prev_sol = true;
+        _set_ig_to_prev_sol = true,
+        _start_calib = false, _stop_calib = false;
 
     int _n_jnts_robot,
         _performed_traj_n = 0,
@@ -195,6 +196,8 @@ private:
 
     PublisherPtr<moving_horizon_jnt_calib::CalibTrajStatus> _traj_status_pub;
     PublisherPtr<moving_horizon_jnt_calib::JntCalibStatus> _jnt_calib_pub;
+
+    moving_horizon_jnt_calib::JntCalibRtRequest _cal_req;
 
     SubscriberPtr<xbot_msgs::CustomState> _aux_signals_sub;
 

@@ -775,7 +775,43 @@ bool CalibTrajReplayerRt::on_jnt_cal_received(const moving_horizon_jnt_calib::Jn
                               moving_horizon_jnt_calib::JntCalibRtResponse& res)
 {
 
-    res.success = true;
+
+    int err = 0;
+
+    if(req.cal_mask.size() == req.lambda.size() == req.lambda_high.size() == _lambda_des.size())
+    {
+
+        for (int i = 0; i < _lambda_des.size(); i++)
+        {
+            _cal_mask_des[i] = req.cal_mask[i];
+            _lambda_des(i) = req.lambda[i];
+            _lambda_high(i) = req.lambda_high[i];
+        }
+
+    }
+    else
+    {
+        err++;
+    }
+
+    if(req.start && !req.stop && !_cal_req.start)
+    { // starting calibration (only if coming fro)
+
+        _start_calib = true;
+        _stop_calib = false;
+
+    }
+    if(req.stop && _cal_req.start && !_cal_req.stop)
+    { // stopping calibration (if calibration was already started and not stopped)
+        _start_calib = false;
+        _stop_calib = true;
+    }
+
+    _cal_req = req; // update message
+    _cal_req.start =  _start_calib;
+    _cal_req.stop = _stop_calib;
+
+    res.success = true ? err == 0: false;
 
     return res.success;
 
