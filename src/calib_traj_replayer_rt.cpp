@@ -202,7 +202,7 @@ void CalibTrajReplayerRt::param_dims_ok_or_throw()
     {
         std::string exception = std::string("Dimension mismatch in YAML parameters. Check the XBot2 config file for errors! "
                                             "All dimensions should be coherent with the provided calibration jnt_list (dim: ") +
-                                std::to_string(_jnt_list.size()) + std::string(" )\n");
+                                std::to_string(_jnt_list.size()) + std::string(").\n");
 
         throw std::invalid_argument(exception);
     }
