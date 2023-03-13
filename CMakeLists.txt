@@ -14,6 +14,8 @@ find_package(matlogger2 REQUIRED)
 
 find_package(catkin REQUIRED roscpp rospy urdf sensor_msgs std_msgs message_generation)
 
+option(XBOT2_ENABLE_XENO OFF "Compile against xenomai")
+
 add_service_files(
   FILES
   JntCalibRt.srv
