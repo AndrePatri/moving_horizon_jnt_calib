@@ -34,8 +34,8 @@ class StartCalibTraj
             _go2_init_conf.request.perform_calib_traj = false;
             _go2_init_conf.request.go2calib_traj = true;
 
-            _start_cal_traj.request.perform_calib_traj = false;
-            _start_cal_traj.request.go2calib_traj = true;
+            _start_cal_traj.request.perform_calib_traj = true;
+            _start_cal_traj.request.go2calib_traj = false;
 
         }
 
