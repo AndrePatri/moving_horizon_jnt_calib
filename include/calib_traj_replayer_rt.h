@@ -149,7 +149,8 @@ private:
                     _alpha_d0, _alpha_d1, _alpha_inertial, _alpha_kt,
                     _tau_friction, _tau_mot, _tau_inertial;
 
-    Eigen::VectorXd _lambda, _lambda_des;
+    Eigen::VectorXd _lambda, _lambda_des,
+                    _lambda_high, _lambda_high_solv;
 
     std::vector<double> _q_p_cmd_vect, _q_p_dot_cmd_vect, _q_p_ddot_cmd_vect;
 
@@ -167,7 +168,7 @@ private:
                         _alpha_kt_vect,
                         _iq_meas_vect,
                         _jnt_cal_sol_millis_vect,
-                        _lambda_vect, _lambda_des_vect;
+                        _lambda_vect, _lambda_des_vect, _lambda_high_vect;
 
     std::vector<double> _K_t_ig_vect,
                         _K_d0_ig_vect,

@@ -151,9 +151,11 @@ void CalibTrajReplayerRt::init_vars()
     _cal_mask_des_ros = std::vector<uint8_t>(4);
 
     _lambda = Eigen::VectorXd::Zero(_lambda_des.size());
+    _lambda_high_solv = Eigen::VectorXd::Zero(_lambda_des.size());
 
     _lambda_vect = std::vector<double>(_lambda.size());
     _lambda_des_vect = std::vector<double>(_lambda_des.size());
+    _lambda_high_vect = std::vector<double>(_lambda_des.size());
 
 }
 
@@ -188,6 +190,8 @@ void CalibTrajReplayerRt::get_params_from_config()
     _cal_mask_des = getParamOrThrow<std::vector<bool>>("~cal_mask");
     _rot_calib_window_size = getParamOrThrow<int>("~rot_calib_window_size");
     _lambda_des = getParamOrThrow<Eigen::VectorXd>("~lambda");
+    _lambda_high = getParamOrThrow<Eigen::VectorXd>("~lambda_high");
+
     _alpha = getParamOrThrow<int>("~alpha");
     _q_dot_3sigma = getParamOrThrow<double>("~q_dot_3sigma");
     _mov_avrg_cutoff_freq = getParamOrThrow<double>("~mov_avrg_cutoff_freq");
@@ -636,6 +640,7 @@ void CalibTrajReplayerRt::pub_calib_status()
     {
         _lambda_vect[i] = _lambda(i);
         _lambda_des_vect[i] = _lambda_des(i);
+        _lambda_high_vect[i] = _lambda_high_solv(i);
     }
 
     status_msg->msg().iq = _iq_meas_vect;
@@ -780,6 +785,7 @@ void CalibTrajReplayerRt::run_jnt_calib()
 {
 
     _rot_dyn_calib.set_lambda(_lambda_des); // setting latest available regularization
+    _rot_dyn_calib.set_lambda_high(_lambda_high); // setting latest available regularization
 
     apply_calib_mask(); // we first apply the calibration mask, just in case the mask
     // was changed externally
@@ -814,6 +820,7 @@ void CalibTrajReplayerRt::get_calib_data()
 
     _rot_dyn_calib.get_lambda_des(_lambda_des);
     _rot_dyn_calib.get_lambda(_lambda);
+    _rot_dyn_calib.get_lambda_high(_lambda_high_solv);
 
     _rot_dyn_calib.get_ig_Kd0(_K_d0_ig_solv);
     _rot_dyn_calib.get_ig_Kd1(_K_d1_ig_solv);

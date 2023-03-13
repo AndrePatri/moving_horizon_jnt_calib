@@ -29,6 +29,7 @@ float64[] sol_millis
 
 float64[] lambda
 float64[] lambda_des
+float64[] lambda_high
 
 bool[] cal_mask
 bool[] cal_mask_des
