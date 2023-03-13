@@ -82,6 +82,11 @@ void CalibTrajReplayerRt::init_vars()
     _rot_MoI = Eigen::VectorXd::Zero(_jnt_list.size());
     _K_t = Eigen::VectorXd::Zero(_jnt_list.size());
 
+    _K_d0_ig_solv = Eigen::VectorXd::Zero(_jnt_list.size());
+    _K_d1_ig_solv = Eigen::VectorXd::Zero(_jnt_list.size());
+    _rot_MoI_ig_solv = Eigen::VectorXd::Zero(_jnt_list.size());
+    _K_t_ig_solv = Eigen::VectorXd::Zero(_jnt_list.size());
+
     _q_p_cmd_vect = std::vector<double>(_n_jnts_robot);
     _q_p_dot_cmd_vect = std::vector<double>(_n_jnts_robot);
     _q_p_ddot_cmd_vect = std::vector<double>(_n_jnts_robot);
@@ -610,10 +615,10 @@ void CalibTrajReplayerRt::pub_calib_status()
         _K_t_vect[i] = _K_t[i];
         _rot_MoI_vect[i] = _rot_MoI[i];
 
-        _K_d0_ig_vect[i] = _K_d0_ig[i];
-        _K_d1_ig_vect[i] = _K_d1_ig[i];
-        _K_t_ig_vect[i] = _K_t_ig[i];
-        _rot_MoI_ig_vect[i] = _rot_MoI_ig[i];
+        _K_d0_ig_vect[i] = _K_d0_ig_solv[i];
+        _K_d1_ig_vect[i] = _K_d1_ig_solv[i];
+        _K_t_ig_vect[i] = _K_t_ig_solv[i];
+        _rot_MoI_ig_vect[i] = _rot_MoI_ig_solv[i];
 
         _K_d0_nom_vect[i] = _K_d0_nom[i];
         _K_d1_nom_vect[i] = _K_d1_nom[i];
@@ -622,9 +627,12 @@ void CalibTrajReplayerRt::pub_calib_status()
 
         _jnt_cal_sol_millis_vect[i] = _jnt_cal_sol_millis(i);
 
+    }
+
+    for (int i = 0; i < _lambda.size(); i++)
+    {
         _lambda_vect[i] = _lambda(i);
         _lambda_des_vect[i] = _lambda_des(i);
-
     }
 
     status_msg->msg().iq = _iq_meas_vect;
@@ -803,6 +811,11 @@ void CalibTrajReplayerRt::get_calib_data()
 
     _rot_dyn_calib.get_lambda_des(_lambda_des);
     _rot_dyn_calib.get_lambda(_lambda);
+
+    _rot_dyn_calib.get_ig_Kd0(_K_d0_ig_solv);
+    _rot_dyn_calib.get_ig_Kd1(_K_d1_ig_solv);
+    _rot_dyn_calib.get_ig_Kt(_rot_MoI_ig_solv);
+    _rot_dyn_calib.get_ig_MoI(_K_t_ig_solv);
 
     // we set the ig for the next solution to be
     // the last obtained solution (if the parameter is inactive,
