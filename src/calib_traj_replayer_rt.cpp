@@ -351,11 +351,14 @@ void CalibTrajReplayerRt::set_approach_trajectory()
 
     _peisekah_utils.compute_peisekah_vect_val(_approach_traj_phase, _q_p_init_appr_traj, _q_p_trgt_appr_traj, _q_p_cmd);
 
-    jhigh().jprint(fmt::fg(fmt::terminal_color::blue),
-           std::string("\n _approach_traj_time {} \n"), _approach_traj_time);
+    if(_verbose)
+    {
+        jhigh().jprint(fmt::fg(fmt::terminal_color::blue),
+               std::string("\n _approach_traj_time {} \n"), _approach_traj_time);
 
-    jhigh().jprint(fmt::fg(fmt::terminal_color::blue),
-           std::string("\n _approach_traj_exec_time {} \n"), _approach_traj_exec_time);
+        jhigh().jprint(fmt::fg(fmt::terminal_color::blue),
+               std::string("\n _approach_traj_exec_time {} \n"), _approach_traj_exec_time);
+    }
 
 }
 
@@ -814,8 +817,8 @@ void CalibTrajReplayerRt::get_calib_data()
 
     _rot_dyn_calib.get_ig_Kd0(_K_d0_ig_solv);
     _rot_dyn_calib.get_ig_Kd1(_K_d1_ig_solv);
-    _rot_dyn_calib.get_ig_Kt(_rot_MoI_ig_solv);
-    _rot_dyn_calib.get_ig_MoI(_K_t_ig_solv);
+    _rot_dyn_calib.get_ig_Kt(_K_t_ig_solv);
+    _rot_dyn_calib.get_ig_MoI(_rot_MoI_ig_solv);
 
     // we set the ig for the next solution to be
     // the last obtained solution (if the parameter is inactive,
