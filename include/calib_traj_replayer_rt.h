@@ -164,7 +164,8 @@ private:
                         _alpha_inertial_vect,
                         _alpha_kt_vect,
                         _iq_meas_vect,
-                        _jnt_cal_sol_millis_vect;
+                        _jnt_cal_sol_millis_vect,
+                        _lambda_vect, _lambda_des_vect;
 
     std::vector<double> _K_t_ig_vect,
                         _K_d0_ig_vect,

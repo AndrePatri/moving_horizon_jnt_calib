@@ -147,6 +147,9 @@ void CalibTrajReplayerRt::init_vars()
 
     _lambda = Eigen::VectorXd::Zero(_lambda_des.size());
 
+    _lambda_vect = std::vector<double>(_lambda.size());
+    _lambda_des_vect = std::vector<double>(_lambda_des.size());
+
 }
 
 void CalibTrajReplayerRt::get_params_from_config()
@@ -616,6 +619,9 @@ void CalibTrajReplayerRt::pub_calib_status()
         _rot_MoI_nom_vect[i] = _rot_MoI_nom[i];
 
         _jnt_cal_sol_millis_vect[i] = _jnt_cal_sol_millis(i);
+
+        _lambda_vect[i] = _lambda(i);
+        _lambda_des_vect[i] = _lambda_des(i);
 
     }
 
