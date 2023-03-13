@@ -52,7 +52,7 @@ target_link_libraries(start_calib_traj PRIVATE awesome_utils::awesome_utils xbot
 install(
     TARGETS
     calib_traj_replayer_rt
-#    jnt_calib_rt
+    start_calib_traj
     DESTINATION lib
 )
 
