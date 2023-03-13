@@ -123,8 +123,8 @@ private:
     std::vector<double> _omega_k;
     std::vector<double> _time_ref;
 
-    std::vector<bool> _cal_mask;
-    std::vector<uint8_t> _cal_mask_ros;
+    std::vector<bool> _cal_mask, _cal_mask_des;
+    std::vector<uint8_t> _cal_mask_ros, _cal_mask_des_ros;
 
     Eigen::VectorXd _q_p_meas,
                     _q_p_dot_meas,
@@ -147,7 +147,7 @@ private:
                     _alpha_d0, _alpha_d1, _alpha_inertial, _alpha_kt,
                     _tau_friction, _tau_mot, _tau_inertial;
 
-    Eigen::VectorXd _lambda;
+    Eigen::VectorXd _lambda, _lambda_des;
 
     std::vector<double> _q_p_cmd_vect, _q_p_dot_cmd_vect, _q_p_ddot_cmd_vect;
 
@@ -165,6 +165,15 @@ private:
                         _alpha_kt_vect,
                         _iq_meas_vect,
                         _jnt_cal_sol_millis_vect;
+
+    std::vector<double> _K_t_ig_vect,
+                        _K_d0_ig_vect,
+                        _K_d1_ig_vect,
+                        _rot_MoI_ig_vect,
+                        _K_t_nom_vect,
+                        _K_d0_nom_vect,
+                        _K_d1_nom_vect,
+                        _rot_MoI_nom_vect;
 
     PeisekahTrans _peisekah_utils;
 

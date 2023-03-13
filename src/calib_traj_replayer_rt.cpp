@@ -120,10 +120,7 @@ void CalibTrajReplayerRt::init_vars()
     _q_p_ddot_est_vect = std::vector<double>(_jnt_list.size());
     _q_p_dot_meas_vect = std::vector<double>(_jnt_list.size());
     _tau_meas_vect = std::vector<double>(_jnt_list.size());
-    _K_t_vect = std::vector<double>(_jnt_list.size());
-    _K_d0_vect = std::vector<double>(_jnt_list.size());
-    _K_d1_vect = std::vector<double>(_jnt_list.size());
-    _rot_MoI_vect = std::vector<double>(_jnt_list.size());
+
     _red_ratio_vect = std::vector<double>(_jnt_list.size());
     _alpha_d0_vect = std::vector<double>(_jnt_list.size());
     _alpha_d1_vect = std::vector<double>(_jnt_list.size());
@@ -132,8 +129,23 @@ void CalibTrajReplayerRt::init_vars()
     _iq_meas_vect = std::vector<double>(_jnt_list.size());
     _jnt_cal_sol_millis_vect = std::vector<double>(_jnt_list.size());
 
-    _cal_mask_ros = std::vector<uint8_t>(4);
+    _K_t_vect = std::vector<double>(_jnt_list.size());
+    _K_d0_vect = std::vector<double>(_jnt_list.size());
+    _K_d1_vect = std::vector<double>(_jnt_list.size());
+    _rot_MoI_vect = std::vector<double>(_jnt_list.size());
+    _K_t_ig_vect = std::vector<double>(_jnt_list.size());
+    _K_d0_ig_vect = std::vector<double>(_jnt_list.size());
+    _K_d1_ig_vect = std::vector<double>(_jnt_list.size());
+    _rot_MoI_ig_vect = std::vector<double>(_jnt_list.size());
+    _K_t_nom_vect = std::vector<double>(_jnt_list.size());
+    _K_d0_nom_vect = std::vector<double>(_jnt_list.size());
+    _K_d1_nom_vect = std::vector<double>(_jnt_list.size());
+    _rot_MoI_nom_vect = std::vector<double>(_jnt_list.size());
 
+    _cal_mask_ros = std::vector<uint8_t>(4);
+    _cal_mask_des_ros = std::vector<uint8_t>(4);
+
+    _lambda = Eigen::VectorXd::Zero(_lambda_des.size());
 
 }
 
@@ -165,9 +177,9 @@ void CalibTrajReplayerRt::get_params_from_config()
     _q_lb = getParamOrThrow<std::vector<double>>("~q_lb");
     _q_ub = getParamOrThrow<std::vector<double>>("~q_ub");
 
-    _cal_mask = getParamOrThrow<std::vector<bool>>("~cal_mask");
+    _cal_mask_des = getParamOrThrow<std::vector<bool>>("~cal_mask");
     _rot_calib_window_size = getParamOrThrow<int>("~rot_calib_window_size");
-    _lambda = getParamOrThrow<Eigen::VectorXd>("~lambda");
+    _lambda_des = getParamOrThrow<Eigen::VectorXd>("~lambda");
     _alpha = getParamOrThrow<int>("~alpha");
     _q_dot_3sigma = getParamOrThrow<double>("~q_dot_3sigma");
     _mov_avrg_cutoff_freq = getParamOrThrow<double>("~mov_avrg_cutoff_freq");
@@ -587,10 +599,22 @@ void CalibTrajReplayerRt::pub_calib_status()
         _alpha_d1_vect[i] = _alpha_d1[i];
         _alpha_inertial_vect[i] = _alpha_inertial[i];
         _alpha_kt_vect[i] = _alpha_kt[i];
+
         _K_d0_vect[i] = _K_d0[i];
         _K_d1_vect[i] = _K_d1[i];
         _K_t_vect[i] = _K_t[i];
         _rot_MoI_vect[i] = _rot_MoI[i];
+
+        _K_d0_ig_vect[i] = _K_d0_ig[i];
+        _K_d1_ig_vect[i] = _K_d1_ig[i];
+        _K_t_ig_vect[i] = _K_t_ig[i];
+        _rot_MoI_ig_vect[i] = _rot_MoI_ig[i];
+
+        _K_d0_nom_vect[i] = _K_d0_nom[i];
+        _K_d1_nom_vect[i] = _K_d1_nom[i];
+        _K_t_nom_vect[i] = _K_t_nom[i];
+        _rot_MoI_nom_vect[i] = _rot_MoI_nom[i];
+
         _jnt_cal_sol_millis_vect[i] = _jnt_cal_sol_millis(i);
 
     }
@@ -605,21 +629,34 @@ void CalibTrajReplayerRt::pub_calib_status()
     status_msg->msg().alpha_inertial = _alpha_inertial_vect;
     status_msg->msg().alpha_kt = _alpha_kt_vect;
 
+    status_msg->msg().red_ratio = _red_ratio_vect;
+
     status_msg->msg().K_d0_cal = _K_d0_vect;
     status_msg->msg().K_d1_cal = _K_d1_vect;
     status_msg->msg().K_t_cal = _K_t_vect;
     status_msg->msg().rotor_MoI_cal = _rot_MoI_vect;
-    status_msg->msg().red_ratio = _red_ratio_vect;
+
+    status_msg->msg().K_d0_ig = _K_d0_ig_vect;
+    status_msg->msg().K_d1_ig = _K_d1_ig_vect;
+    status_msg->msg().K_t_ig = _K_t_ig_vect;
+    status_msg->msg().rotor_MoI_ig = _rot_MoI_ig_vect;
+
+    status_msg->msg().K_d0_nom = _K_d0_nom_vect;
+    status_msg->msg().K_d1_nom = _K_d1_nom_vect;
+    status_msg->msg().K_t_nom = _K_t_nom_vect;
+    status_msg->msg().rotor_MoI_nom = _rot_MoI_nom_vect;
 
     status_msg->msg().sol_millis = _jnt_cal_sol_millis_vect;
 
     for(int i = 0; i < 4; i++)
     {
         _cal_mask_ros[i] = _cal_mask[i];
+        _cal_mask_des_ros[i] = _cal_mask_des[i];
 
     }
 
     status_msg->msg().cal_mask = _cal_mask_ros;
+    status_msg->msg().cal_mask_des = _cal_mask_des_ros;
 
     _jnt_calib_pub->publishLoaned(std::move(status_msg));
 }
@@ -720,7 +757,7 @@ bool CalibTrajReplayerRt::on_jnt_cal_received(const moving_horizon_jnt_calib::Jn
 void CalibTrajReplayerRt::run_jnt_calib()
 {
 
-    _rot_dyn_calib.set_lambda(_lambda); // setting latest available regularization
+    _rot_dyn_calib.set_lambda(_lambda_des); // setting latest available regularization
 
     apply_calib_mask(); // we first apply the calibration mask, just in case the mask
     // was changed externally
@@ -750,13 +787,19 @@ void CalibTrajReplayerRt::get_calib_data()
     _rot_dyn_calib.get_alpha_kt(_alpha_kt);
     _rot_dyn_calib.get_tau_motor(_tau_mot);
     _rot_dyn_calib.get_tau_inertial(_tau_inertial);
+
+    _rot_dyn_calib.get_cal_mask(_cal_mask);
+
+    _rot_dyn_calib.get_lambda_des(_lambda_des);
+    _rot_dyn_calib.get_lambda(_lambda);
+
 }
 
 void CalibTrajReplayerRt::apply_calib_mask()
 {
-    _rot_dyn_calib.set_solution_mask(_cal_mask);
+    _rot_dyn_calib.set_solution_mask(_cal_mask_des);
 
-    if(_cal_mask[0] = false)
+    if(_cal_mask_des[0] = false)
     { // Kt
         _rot_dyn_calib.set_ig_Kt(_K_t_nom);
     }
@@ -765,7 +808,7 @@ void CalibTrajReplayerRt::apply_calib_mask()
         _rot_dyn_calib.set_ig_Kt(_K_t_ig);
     }
 
-    if(_cal_mask[1] = false)
+    if(_cal_mask_des[1] = false)
     { // rot_MoI
         _rot_dyn_calib.set_ig_MoI(_rot_MoI_nom);
     }
@@ -773,7 +816,7 @@ void CalibTrajReplayerRt::apply_calib_mask()
     {
         _rot_dyn_calib.set_ig_MoI(_rot_MoI_ig);
     }
-    if(_cal_mask[2] = false)
+    if(_cal_mask_des[2] = false)
     { // Kd0
         _rot_dyn_calib.set_ig_Kd0(_K_d0_nom);
     }
@@ -782,7 +825,7 @@ void CalibTrajReplayerRt::apply_calib_mask()
         _rot_dyn_calib.set_ig_Kd0(_K_d0_ig);
     }
 
-    if(_cal_mask[3] = false)
+    if(_cal_mask_des[3] = false)
     { // Kd1
         _rot_dyn_calib.set_ig_Kd1(_K_d1_nom);
     }
@@ -901,7 +944,7 @@ bool CalibTrajReplayerRt::on_initialize()
                                 _rot_MoI_ig,
                                 _K_d0_ig,
                                 _K_d1_ig,
-                                _lambda,
+                                _lambda_des,
                                 _alpha,
                                 _q_dot_3sigma,
                                 _verbose);
