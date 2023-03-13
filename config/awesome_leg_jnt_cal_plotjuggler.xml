@@ -8,7 +8,7 @@
       <DockSplitter sizes="0.250338;0.248985;0.251691;0.248985" orientation="-" count="4">
        <DockArea name="...">
         <plot flip_x="false" flip_y="false" mode="TimeSeries" style="Lines">
-         <range right="17.150000" top="0.000176" left="8.151000" bottom="-0.009890"/>
+         <range right="18.270000" top="-0.062759" left="9.271000" bottom="-0.173662"/>
          <limitY/>
          <curve color="#17becf" name="/traj_replayer/jnt_calib_status/K_d0_cal.0"/>
          <curve color="#bcbd22" name="/traj_replayer/jnt_calib_status/K_d0_cal.1"/>
@@ -16,7 +16,7 @@
        </DockArea>
        <DockArea name="...">
         <plot flip_x="false" flip_y="false" mode="TimeSeries" style="Lines">
-         <range right="17.150000" top="0.000000" left="8.151000" bottom="-0.000000"/>
+         <range right="18.270000" top="-0.028215" left="9.271000" bottom="-0.029064"/>
          <limitY/>
          <curve color="#1f77b4" name="/traj_replayer/jnt_calib_status/K_d1_cal.0"/>
          <curve color="#d62728" name="/traj_replayer/jnt_calib_status/K_d1_cal.1"/>
@@ -24,7 +24,7 @@
        </DockArea>
        <DockArea name="...">
         <plot flip_x="false" flip_y="false" mode="TimeSeries" style="Lines">
-         <range right="17.150000" top="0.145000" left="8.151000" bottom="-0.055000"/>
+         <range right="18.270000" top="-0.036037" left="9.271000" bottom="-0.045196"/>
          <limitY/>
          <curve color="#1ac938" name="/traj_replayer/jnt_calib_status/K_t_cal.0"/>
          <curve color="#ff7f0e" name="/traj_replayer/jnt_calib_status/K_t_cal.1"/>
@@ -32,7 +32,7 @@
        </DockArea>
        <DockArea name="...">
         <plot flip_x="false" flip_y="false" mode="TimeSeries" style="Lines">
-         <range right="17.150000" top="0.000066" left="8.151000" bottom="0.000066"/>
+         <range right="18.270000" top="-0.000741" left="9.271000" bottom="-0.002769"/>
          <limitY/>
          <curve color="#f14cc1" name="/traj_replayer/jnt_calib_status/rotor_MoI_cal.0"/>
          <curve color="#9467bd" name="/traj_replayer/jnt_calib_status/rotor_MoI_cal.1"/>
@@ -42,7 +42,7 @@
       <DockSplitter sizes="0.250338;0.250338;0.248985;0.250338" orientation="-" count="4">
        <DockArea name="...">
         <plot flip_x="false" flip_y="false" mode="TimeSeries" style="Lines">
-         <range right="17.150000" top="0.100000" left="8.151000" bottom="-0.100000"/>
+         <range right="18.270000" top="0.100000" left="9.271000" bottom="-0.100000"/>
          <limitY/>
          <curve color="#17becf" name="/traj_replayer/jnt_calib_status/alpha_d0.0"/>
          <curve color="#bcbd22" name="/traj_replayer/jnt_calib_status/alpha_d0.1"/>
@@ -50,7 +50,7 @@
        </DockArea>
        <DockArea name="...">
         <plot flip_x="false" flip_y="false" mode="TimeSeries" style="Lines">
-         <range right="17.150000" top="0.000000" left="8.151000" bottom="-0.000000"/>
+         <range right="18.270000" top="0.000000" left="9.271000" bottom="-0.000000"/>
          <limitY/>
          <curve color="#1f77b4" name="/traj_replayer/jnt_calib_status/alpha_d1.0"/>
          <curve color="#d62728" name="/traj_replayer/jnt_calib_status/alpha_d1.1"/>
@@ -58,7 +58,7 @@
        </DockArea>
        <DockArea name="...">
         <plot flip_x="false" flip_y="false" mode="TimeSeries" style="Lines">
-         <range right="17.150000" top="0.000008" left="8.151000" bottom="-0.000008"/>
+         <range right="18.270000" top="0.000007" left="9.271000" bottom="-0.000007"/>
          <limitY/>
          <curve color="#1ac938" name="/traj_replayer/jnt_calib_status/alpha_inertial.0"/>
          <curve color="#ff7f0e" name="/traj_replayer/jnt_calib_status/alpha_inertial.1"/>
@@ -66,7 +66,7 @@
        </DockArea>
        <DockArea name="...">
         <plot flip_x="false" flip_y="false" mode="TimeSeries" style="Lines">
-         <range right="17.150000" top="5.364911" left="8.151000" bottom="-0.517057"/>
+         <range right="18.270000" top="5.364911" left="9.271000" bottom="-0.517057"/>
          <limitY/>
          <curve color="#f14cc1" name="/traj_replayer/jnt_calib_status/alpha_kt.0"/>
          <curve color="#9467bd" name="/traj_replayer/jnt_calib_status/alpha_kt.1"/>
@@ -76,7 +76,7 @@
      </DockSplitter>
      <DockArea name="...">
       <plot flip_x="false" flip_y="false" mode="TimeSeries" style="Lines">
-       <range right="17.150000" top="1.025000" left="8.151000" bottom="-0.025000"/>
+       <range right="18.270000" top="1.025000" left="9.271000" bottom="-0.025000"/>
        <limitY/>
        <curve color="#1f77b4" name="/traj_replayer/jnt_calib_status/sol_millis.0"/>
        <curve color="#d62728" name="/traj_replayer/jnt_calib_status/sol_millis.1"/>
@@ -90,7 +90,7 @@
     <DockSplitter sizes="0.25;0.25;0.25;0.25" orientation="-" count="4">
      <DockArea name="...">
       <plot flip_x="false" flip_y="false" mode="TimeSeries" style="Lines">
-       <range right="17.150000" top="0.000000" left="8.151000" bottom="-0.000000"/>
+       <range right="18.270000" top="0.000000" left="9.271000" bottom="-0.000000"/>
        <limitY/>
        <curve color="#bcbd22" name="/traj_replayer/jnt_calib_status/q_dot.0"/>
        <curve color="#1f77b4" name="/traj_replayer/jnt_calib_status/q_dot.1"/>
@@ -98,7 +98,7 @@
      </DockArea>
      <DockArea name="...">
       <plot flip_x="false" flip_y="false" mode="TimeSeries" style="Lines">
-       <range right="17.150000" top="0.000008" left="8.151000" bottom="-0.000008"/>
+       <range right="18.270000" top="0.000007" left="9.271000" bottom="-0.000007"/>
        <limitY/>
        <curve color="#17becf" name="/traj_replayer/jnt_calib_status/q_ddot.0"/>
        <curve color="#d62728" name="/traj_replayer/jnt_calib_status/q_ddot.1"/>
@@ -106,7 +106,7 @@
      </DockArea>
      <DockArea name="...">
       <plot flip_x="false" flip_y="false" mode="TimeSeries" style="Lines">
-       <range right="17.150000" top="5.364911" left="8.151000" bottom="-0.517057"/>
+       <range right="18.270000" top="5.364911" left="9.271000" bottom="-0.517057"/>
        <limitY/>
        <curve color="#1ac938" name="/traj_replayer/jnt_calib_status/iq.0"/>
        <curve color="#ff7f0e" name="/traj_replayer/jnt_calib_status/iq.1"/>
@@ -114,7 +114,7 @@
      </DockArea>
      <DockArea name="...">
       <plot flip_x="false" flip_y="false" mode="TimeSeries" style="Lines">
-       <range right="17.150000" top="12.071051" left="8.151000" bottom="-1.163376"/>
+       <range right="18.270000" top="12.071050" left="9.271000" bottom="-1.163376"/>
        <limitY/>
        <curve color="#9467bd" name="/traj_replayer/jnt_calib_status/tau.0"/>
        <curve color="#17becf" name="/traj_replayer/jnt_calib_status/tau.1"/>
@@ -123,81 +123,13 @@
     </DockSplitter>
    </Container>
   </Tab>
-  <Tab tab_name="tab3" containers="1">
+  <Tab tab_name="tab4" containers="1">
    <Container>
     <DockSplitter sizes="0.25;0.25;0.25;0.25" orientation="-" count="4">
-     <DockSplitter sizes="0.250356;0.249644;0.250356;0.249644" orientation="|" count="4">
+     <DockSplitter sizes="0.166667;0.166667;0.166667;0.166667;0.166667;0.166667" orientation="|" count="6">
       <DockArea name="...">
        <plot flip_x="false" flip_y="false" mode="TimeSeries" style="Lines">
-        <range right="17.150000" top="0.000176" left="8.151000" bottom="-0.009890"/>
-        <limitY/>
-        <curve color="#d62728" name="/traj_replayer/jnt_calib_status/K_d0_cal.0"/>
-        <curve color="#d62728" name="/traj_replayer/jnt_calib_status/K_d0_cal.1"/>
-       </plot>
-      </DockArea>
-      <DockArea name="...">
-       <plot flip_x="false" flip_y="false" mode="TimeSeries" style="Lines">
-        <range right="17.150000" top="0.100000" left="8.151000" bottom="-0.100000"/>
-        <limitY/>
-        <curve color="#1f77b4" name="/traj_replayer/jnt_calib_status/K_d0_ig.0"/>
-        <curve color="#1ac938" name="/traj_replayer/jnt_calib_status/K_d0_ig.1"/>
-       </plot>
-      </DockArea>
-      <DockArea name="...">
-       <plot flip_x="false" flip_y="false" mode="TimeSeries" style="Lines">
-        <range right="17.150000" top="10.907000" left="8.151000" bottom="3.053000"/>
-        <limitY/>
-        <curve color="#bcbd22" name="/traj_replayer/jnt_calib_status/K_d0_nom.0"/>
-        <curve color="#ff7f0e" name="/traj_replayer/jnt_calib_status/K_d0_nom.1"/>
-       </plot>
-      </DockArea>
-      <DockArea name="...">
-       <plot flip_x="false" flip_y="false" mode="TimeSeries" style="Lines">
-        <range right="17.150000" top="0.100000" left="8.151000" bottom="-0.100000"/>
-        <limitY/>
-        <curve color="#9467bd" name="/traj_replayer/jnt_calib_status/cal_mask_des.0"/>
-        <curve color="#17becf" name="/traj_replayer/jnt_calib_status/cal_mask.0"/>
-       </plot>
-      </DockArea>
-     </DockSplitter>
-     <DockSplitter sizes="0.250356;0.249644;0.250356;0.249644" orientation="|" count="4">
-      <DockArea name="...">
-       <plot flip_x="false" flip_y="false" mode="TimeSeries" style="Lines">
-        <range right="17.150000" top="0.000000" left="8.151000" bottom="-0.000000"/>
-        <limitY/>
-        <curve color="#1ac938" name="/traj_replayer/jnt_calib_status/K_d1_cal.0"/>
-        <curve color="#f14cc1" name="/traj_replayer/jnt_calib_status/K_d1_cal.1"/>
-       </plot>
-      </DockArea>
-      <DockArea name="...">
-       <plot flip_x="false" flip_y="false" mode="TimeSeries" style="Lines">
-        <range right="17.150000" top="0.100000" left="8.151000" bottom="-0.100000"/>
-        <limitY/>
-        <curve color="#9467bd" name="/traj_replayer/jnt_calib_status/K_d1_ig.0"/>
-        <curve color="#17becf" name="/traj_replayer/jnt_calib_status/K_d1_ig.1"/>
-       </plot>
-      </DockArea>
-      <DockArea name="...">
-       <plot flip_x="false" flip_y="false" mode="TimeSeries" style="Lines">
-        <range right="17.150000" top="1.778000" left="8.151000" bottom="1.442000"/>
-        <limitY/>
-        <curve color="#bcbd22" name="/traj_replayer/jnt_calib_status/K_d1_nom.0"/>
-        <curve color="#1f77b4" name="/traj_replayer/jnt_calib_status/K_d1_nom.1"/>
-       </plot>
-      </DockArea>
-      <DockArea name="...">
-       <plot flip_x="false" flip_y="false" mode="TimeSeries" style="Lines">
-        <range right="17.150000" top="0.100000" left="8.151000" bottom="-0.100000"/>
-        <limitY/>
-        <curve color="#bcbd22" name="/traj_replayer/jnt_calib_status/cal_mask.1"/>
-        <curve color="#1f77b4" name="/traj_replayer/jnt_calib_status/cal_mask_des.1"/>
-       </plot>
-      </DockArea>
-     </DockSplitter>
-     <DockSplitter sizes="0.250356;0.249644;0.250356;0.249644" orientation="|" count="4">
-      <DockArea name="...">
-       <plot flip_x="false" flip_y="false" mode="TimeSeries" style="Lines">
-        <range right="17.150000" top="0.145000" left="8.151000" bottom="-0.055000"/>
+        <range right="18.270000" top="-0.036037" left="9.271000" bottom="-0.045196"/>
         <limitY/>
         <curve color="#d62728" name="/traj_replayer/jnt_calib_status/K_t_cal.0"/>
         <curve color="#1ac938" name="/traj_replayer/jnt_calib_status/K_t_cal.1"/>
@@ -205,7 +137,7 @@
       </DockArea>
       <DockArea name="...">
        <plot flip_x="false" flip_y="false" mode="TimeSeries" style="Lines">
-        <range right="17.150000" top="0.145000" left="8.151000" bottom="-0.055000"/>
+        <range right="18.270000" top="-0.036037" left="9.271000" bottom="-0.045196"/>
         <limitY/>
         <curve color="#ff7f0e" name="/traj_replayer/jnt_calib_status/K_t_ig.0"/>
         <curve color="#f14cc1" name="/traj_replayer/jnt_calib_status/K_t_ig.1"/>
@@ -213,7 +145,7 @@
       </DockArea>
       <DockArea name="...">
        <plot flip_x="false" flip_y="false" mode="TimeSeries" style="Lines">
-        <range right="17.150000" top="0.145000" left="8.151000" bottom="-0.055000"/>
+        <range right="18.270000" top="0.145000" left="9.271000" bottom="-0.055000"/>
         <limitY/>
         <curve color="#9467bd" name="/traj_replayer/jnt_calib_status/K_t_nom.0"/>
         <curve color="#17becf" name="/traj_replayer/jnt_calib_status/K_t_nom.1"/>
@@ -221,17 +153,127 @@
       </DockArea>
       <DockArea name="...">
        <plot flip_x="false" flip_y="false" mode="TimeSeries" style="Lines">
-        <range right="17.150000" top="0.100000" left="8.151000" bottom="-0.100000"/>
+        <range right="18.270000" top="1000000.100000" left="9.271000" bottom="999999.900000"/>
+        <limitY/>
+        <curve color="#9467bd" name="/traj_replayer/jnt_calib_status/lambda.0"/>
+       </plot>
+      </DockArea>
+      <DockArea name="...">
+       <plot flip_x="false" flip_y="false" mode="TimeSeries" style="Lines">
+        <range right="18.270000" top="0.200000" left="9.271000" bottom="0.000000"/>
+        <limitY/>
+        <curve color="#1f77b4" name="/traj_replayer/jnt_calib_status/lambda_des.0"/>
+       </plot>
+      </DockArea>
+      <DockArea name="...">
+       <plot flip_x="false" flip_y="false" mode="TimeSeries" style="Lines">
+        <range right="18.270000" top="0.100000" left="9.271000" bottom="-0.100000"/>
+        <limitY/>
+        <curve color="#17becf" name="/traj_replayer/jnt_calib_status/cal_mask.0"/>
+        <curve color="#9467bd" name="/traj_replayer/jnt_calib_status/cal_mask_des.0"/>
+       </plot>
+      </DockArea>
+     </DockSplitter>
+     <DockSplitter sizes="0.166667;0.166667;0.166667;0.166667;0.166667;0.166667" orientation="|" count="6">
+      <DockArea name="...">
+       <plot flip_x="false" flip_y="false" mode="TimeSeries" style="Lines">
+        <range right="18.270000" top="-0.062759" left="9.271000" bottom="-0.173662"/>
+        <limitY/>
+        <curve color="#d62728" name="/traj_replayer/jnt_calib_status/K_d0_cal.0"/>
+        <curve color="#d62728" name="/traj_replayer/jnt_calib_status/K_d0_cal.1"/>
+       </plot>
+      </DockArea>
+      <DockArea name="...">
+       <plot flip_x="false" flip_y="false" mode="TimeSeries" style="Lines">
+        <range right="18.270000" top="-0.062759" left="9.271000" bottom="-0.173662"/>
+        <limitY/>
+        <curve color="#1f77b4" name="/traj_replayer/jnt_calib_status/K_d0_ig.0"/>
+        <curve color="#1ac938" name="/traj_replayer/jnt_calib_status/K_d0_ig.1"/>
+       </plot>
+      </DockArea>
+      <DockArea name="...">
+       <plot flip_x="false" flip_y="false" mode="TimeSeries" style="Lines">
+        <range right="18.270000" top="10.907000" left="9.271000" bottom="3.053000"/>
+        <limitY/>
+        <curve color="#bcbd22" name="/traj_replayer/jnt_calib_status/K_d0_nom.0"/>
+        <curve color="#ff7f0e" name="/traj_replayer/jnt_calib_status/K_d0_nom.1"/>
+       </plot>
+      </DockArea>
+      <DockArea name="...">
+       <plot flip_x="false" flip_y="false" mode="TimeSeries" style="Lines">
+        <range right="18.270000" top="1000000.100000" left="9.271000" bottom="999999.900000"/>
+        <limitY/>
+        <curve color="#17becf" name="/traj_replayer/jnt_calib_status/lambda.1"/>
+       </plot>
+      </DockArea>
+      <DockArea name="...">
+       <plot flip_x="false" flip_y="false" mode="TimeSeries" style="Lines">
+        <range right="18.270000" top="0.200000" left="9.271000" bottom="0.000000"/>
+        <limitY/>
+        <curve color="#d62728" name="/traj_replayer/jnt_calib_status/lambda_des.1"/>
+       </plot>
+      </DockArea>
+      <DockArea name="...">
+       <plot flip_x="false" flip_y="false" mode="TimeSeries" style="Lines">
+        <range right="18.270000" top="0.100000" left="9.271000" bottom="-0.100000"/>
+        <limitY/>
+        <curve color="#bcbd22" name="/traj_replayer/jnt_calib_status/cal_mask.1"/>
+        <curve color="#1f77b4" name="/traj_replayer/jnt_calib_status/cal_mask_des.1"/>
+       </plot>
+      </DockArea>
+     </DockSplitter>
+     <DockSplitter sizes="0.166667;0.166667;0.166667;0.166667;0.166667;0.166667" orientation="|" count="6">
+      <DockArea name="...">
+       <plot flip_x="false" flip_y="false" mode="TimeSeries" style="Lines">
+        <range right="18.270000" top="-0.028215" left="9.271000" bottom="-0.029064"/>
+        <limitY/>
+        <curve color="#1ac938" name="/traj_replayer/jnt_calib_status/K_d1_cal.0"/>
+        <curve color="#f14cc1" name="/traj_replayer/jnt_calib_status/K_d1_cal.1"/>
+       </plot>
+      </DockArea>
+      <DockArea name="...">
+       <plot flip_x="false" flip_y="false" mode="TimeSeries" style="Lines">
+        <range right="18.270000" top="-0.028215" left="9.271000" bottom="-0.029064"/>
+        <limitY/>
+        <curve color="#9467bd" name="/traj_replayer/jnt_calib_status/K_d1_ig.0"/>
+        <curve color="#17becf" name="/traj_replayer/jnt_calib_status/K_d1_ig.1"/>
+       </plot>
+      </DockArea>
+      <DockArea name="...">
+       <plot flip_x="false" flip_y="false" mode="TimeSeries" style="Lines">
+        <range right="18.270000" top="1.778000" left="9.271000" bottom="1.442000"/>
+        <limitY/>
+        <curve color="#bcbd22" name="/traj_replayer/jnt_calib_status/K_d1_nom.0"/>
+        <curve color="#1f77b4" name="/traj_replayer/jnt_calib_status/K_d1_nom.1"/>
+       </plot>
+      </DockArea>
+      <DockArea name="...">
+       <plot flip_x="false" flip_y="false" mode="TimeSeries" style="Lines">
+        <range right="18.270000" top="0.100000" left="9.271000" bottom="-0.100000"/>
+        <limitY/>
+        <curve color="#bcbd22" name="/traj_replayer/jnt_calib_status/lambda.2"/>
+       </plot>
+      </DockArea>
+      <DockArea name="...">
+       <plot flip_x="false" flip_y="false" mode="TimeSeries" style="Lines">
+        <range right="18.270000" top="0.100000" left="9.271000" bottom="-0.100000"/>
+        <limitY/>
+        <curve color="#1ac938" name="/traj_replayer/jnt_calib_status/lambda_des.2"/>
+       </plot>
+      </DockArea>
+      <DockArea name="...">
+       <plot flip_x="false" flip_y="false" mode="TimeSeries" style="Lines">
+        <range right="18.270000" top="0.100000" left="9.271000" bottom="-0.100000"/>
         <limitY/>
         <curve color="#d62728" name="/traj_replayer/jnt_calib_status/cal_mask.2"/>
         <curve color="#1ac938" name="/traj_replayer/jnt_calib_status/cal_mask_des.2"/>
        </plot>
       </DockArea>
      </DockSplitter>
-     <DockSplitter sizes="0.250356;0.249644;0.250356;0.249644" orientation="|" count="4">
+     <DockSplitter sizes="0.166667;0.166667;0.166667;0.166667;0.166667;0.166667" orientation="|" count="6">
       <DockArea name="...">
        <plot flip_x="false" flip_y="false" mode="TimeSeries" style="Lines">
-        <range right="17.150000" top="0.000066" left="8.151000" bottom="0.000066"/>
+        <range right="18.270000" top="-0.000741" left="9.271000" bottom="-0.002769"/>
         <limitY/>
         <curve color="#bcbd22" name="/traj_replayer/jnt_calib_status/rotor_MoI_cal.0"/>
         <curve color="#1f77b4" name="/traj_replayer/jnt_calib_status/rotor_MoI_cal.1"/>
@@ -239,7 +281,7 @@
       </DockArea>
       <DockArea name="...">
        <plot flip_x="false" flip_y="false" mode="TimeSeries" style="Lines">
-        <range right="17.150000" top="0.000066" left="8.151000" bottom="0.000066"/>
+        <range right="18.270000" top="-0.000741" left="9.271000" bottom="-0.002769"/>
         <limitY/>
         <curve color="#d62728" name="/traj_replayer/jnt_calib_status/rotor_MoI_ig.0"/>
         <curve color="#1ac938" name="/traj_replayer/jnt_calib_status/rotor_MoI_ig.1"/>
@@ -247,7 +289,7 @@
       </DockArea>
       <DockArea name="...">
        <plot flip_x="false" flip_y="false" mode="TimeSeries" style="Lines">
-        <range right="17.150000" top="0.000066" left="8.151000" bottom="0.000066"/>
+        <range right="18.270000" top="0.000066" left="9.271000" bottom="0.000066"/>
         <limitY/>
         <curve color="#ff7f0e" name="/traj_replayer/jnt_calib_status/rotor_MoI_nom.0"/>
         <curve color="#f14cc1" name="/traj_replayer/jnt_calib_status/rotor_MoI_nom.1"/>
@@ -255,7 +297,21 @@
       </DockArea>
       <DockArea name="...">
        <plot flip_x="false" flip_y="false" mode="TimeSeries" style="Lines">
-        <range right="17.150000" top="0.100000" left="8.151000" bottom="-0.100000"/>
+        <range right="18.270000" top="0.100000" left="9.271000" bottom="-0.100000"/>
+        <limitY/>
+        <curve color="#f14cc1" name="/traj_replayer/jnt_calib_status/lambda.3"/>
+       </plot>
+      </DockArea>
+      <DockArea name="...">
+       <plot flip_x="false" flip_y="false" mode="TimeSeries" style="Lines">
+        <range right="18.270000" top="0.100000" left="9.271000" bottom="-0.100000"/>
+        <limitY/>
+        <curve color="#ff7f0e" name="/traj_replayer/jnt_calib_status/lambda_des.3"/>
+       </plot>
+      </DockArea>
+      <DockArea name="...">
+       <plot flip_x="false" flip_y="false" mode="TimeSeries" style="Lines">
+        <range right="18.270000" top="0.100000" left="9.271000" bottom="-0.100000"/>
         <limitY/>
         <curve color="#ff7f0e" name="/traj_replayer/jnt_calib_status/cal_mask.3"/>
         <curve color="#f14cc1" name="/traj_replayer/jnt_calib_status/cal_mask_des.3"/>
