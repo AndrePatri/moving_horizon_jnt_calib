@@ -684,6 +684,7 @@ void CalibTrajReplayerRt::pub_calib_status()
 
     status_msg->msg().lambda_des = _lambda_des_vect;
     status_msg->msg().lambda = _lambda_vect;
+    status_msg->msg().lambda_high = _lambda_high_vect;
 
     _jnt_calib_pub->publishLoaned(std::move(status_msg));
 }
