@@ -196,7 +196,9 @@ void CalibTrajReplayerRt::param_dims_ok_or_throw()
        (_K_t_nom.size() != _rot_MoI_nom.size()) ||
        (_rot_MoI_nom.size() != _K_d0_nom.size()) ||
        (_K_d0_nom.size() != _K_d1_nom.size()) ||
-       (_K_d1_nom.size() !=_jnt_list.size()))
+       (_K_d1_nom.size() != _q_ub.size()) ||
+       (_q_ub.size() != _q_lb.size()) ||
+       (_q_lb.size() != _jnt_list.size()))
     {
         std::string exception = std::string("Dimension mismatch in YAML parameters. Check the XBot2 config file for errors! "
                                             "All dimensions should be coherent with the provided calibration jnt_list\n");
