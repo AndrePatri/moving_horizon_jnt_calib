@@ -844,7 +844,7 @@ bool CalibTrajReplayerRt::on_initialize()
       // joint name
 
     jhigh().jprint(fmt::fg(fmt::terminal_color::blue),
-                          "\n CalibTrajReplayerRt::on_initialize(): joint which will be controlled --> \n");
+                          "\n CalibTrajReplayerRt::on_initialize(): joint to be calibrated --> \n");
 
     for(int i = 0; i < _jnt_list.size(); i ++)
     {
