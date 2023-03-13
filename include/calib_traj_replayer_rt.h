@@ -86,7 +86,8 @@ private:
         _verbose = false,
         _go2calib_traj = false, _approach_traj_started = false, _approach_traj_finished = false,
         _perform_traj = false, _traj_started = false, _traj_finished = false,
-        _idle = true;
+        _idle = true,
+        _set_ig_to_prev_sol = true;
 
     int _n_jnts_robot,
         _performed_traj_n = 0,

@@ -197,6 +197,8 @@ void CalibTrajReplayerRt::get_params_from_config()
     _K_d0_nom = getParamOrThrow<Eigen::VectorXd>("~K_d0_nom");
     _K_d1_nom = getParamOrThrow<Eigen::VectorXd>("~K_d1_nom");
 
+    _set_ig_to_prev_sol = getParamOrThrow<bool>("~set_ig_to_prev_sol");
+
     param_dims_ok_or_throw();
 }
 
@@ -801,6 +803,18 @@ void CalibTrajReplayerRt::get_calib_data()
 
     _rot_dyn_calib.get_lambda_des(_lambda_des);
     _rot_dyn_calib.get_lambda(_lambda);
+
+    // we set the ig for the next solution to be
+    // the last obtained solution (if the parameter is inactive,
+    // its ig will be overwritten by the call to apply_calib_mask())
+
+    if(_set_ig_to_prev_sol)
+    {
+        _K_t_ig = _K_t;
+        _K_d0_ig = _K_d0;
+        _K_d1_ig = _K_d1;
+        _rot_MoI_ig = _rot_MoI;
+    }
 
 }
 

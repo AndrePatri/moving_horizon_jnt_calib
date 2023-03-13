@@ -46,6 +46,7 @@ xbotcore_plugins:
             cal_mask: {value: [true, false, false, false], type: vector<bool>} # which components of rotor's dynamics to calibrate: [K_t, K_d0, K_d1, rot_MoI]
             lambda: {value: [0.1, 0.1, 0.1, 0.1], type: Eigen::VectorXd}
             mov_avrg_cutoff_freq: {value: 10.0, type: double} # [Hz]
+            set_ig_to_prev_sol: {value: true, type: bool}
 
             jnt_list: {value: ["hip_pitch_1", "knee_pitch_1"], type: vector<string>} # joints to be calibrated
 
