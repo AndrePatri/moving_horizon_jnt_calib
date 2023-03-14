@@ -491,25 +491,89 @@ void CalibTrajReplayerRt::init_dump_logger()
     _dump_logger->create("loop_time", 1, 1, _matlogger_buffer_size);
     _dump_logger->create("traj_time", 1, 1, _matlogger_buffer_size);
 
-    _dump_logger->create("q_p_meas", _n_jnts_robot), 1, _matlogger_buffer_size;
-    _dump_logger->create("q_p_dot_meas", _n_jnts_robot, 1, _matlogger_buffer_size);
+    _dump_logger->create("jnt_cal_sol_millis", _jnt_list.size(), 1, _matlogger_buffer_size);
+    _dump_logger->create("_alpha_d0", _jnt_list.size(), 1, _matlogger_buffer_size);
+    _dump_logger->create("_alpha_d1", _jnt_list.size(), 1, _matlogger_buffer_size);
+    _dump_logger->create("_alpha_inertial", _jnt_list.size(), 1, _matlogger_buffer_size);
+    _dump_logger->create("_alpha_kt", _jnt_list.size(), 1, _matlogger_buffer_size);
+
+    _dump_logger->create("lambda", _lambda_des.size(), 1, _matlogger_buffer_size);
+    _dump_logger->create("lambda_des", _lambda_des.size(), 1, _matlogger_buffer_size);
+    _dump_logger->create("lambda_high", _lambda_des.size(), 1, _matlogger_buffer_size);
+    _dump_logger->create("cal_mask", _lambda_des.size(), 1, _matlogger_buffer_size);
+
+    _dump_logger->create("q_p_dot_meas", _jnt_list.size(), 1, _matlogger_buffer_size);
+    _dump_logger->create("q_p_ddot_meas", _jnt_list.size(), 1, _matlogger_buffer_size);
+    _dump_logger->create("tau_meas", _jnt_list.size(), 1, _matlogger_buffer_size);
+    _dump_logger->create("iq_meas", _jnt_list.size(), 1, _matlogger_buffer_size);
 
     _dump_logger->create("q_p_cmd", _n_jnts_robot, 1, _matlogger_buffer_size);
     _dump_logger->create("q_p_dot_cmd", _n_jnts_robot, 1, _matlogger_buffer_size);
+    _dump_logger->create("q_p_ddot_cmd", _n_jnts_robot, 1, _matlogger_buffer_size);
+
+    _dump_logger->create("K_d0", _jnt_list.size(), 1, _matlogger_buffer_size);
+    _dump_logger->create("K_d1", _jnt_list.size(), 1, _matlogger_buffer_size);
+    _dump_logger->create("rot_MoI", _jnt_list.size(), 1, _matlogger_buffer_size);
+    _dump_logger->create("K_t", _jnt_list.size(), 1, _matlogger_buffer_size);
+    _dump_logger->create("red_ratio", _jnt_list.size(), 1, _matlogger_buffer_size);
+
+    _dump_logger->create("K_d0_ig", _jnt_list.size(), 1, _matlogger_buffer_size);
+    _dump_logger->create("K_d1_ig", _jnt_list.size(), 1, _matlogger_buffer_size);
+    _dump_logger->create("rot_MoI_ig", _jnt_list.size(), 1, _matlogger_buffer_size);
+    _dump_logger->create("K_t_ig", _jnt_list.size(), 1, _matlogger_buffer_size);
+    _dump_logger->create("red_ratio_ig", _jnt_list.size(), 1, _matlogger_buffer_size);
+
+    _dump_logger->create("K_d0_nom", _jnt_list.size(), 1, _matlogger_buffer_size);
+    _dump_logger->create("K_d1_nom", _jnt_list.size(), 1, _matlogger_buffer_size);
+    _dump_logger->create("rot_MoI_nom", _jnt_list.size(), 1, _matlogger_buffer_size);
+    _dump_logger->create("K_t_nom", _jnt_list.size(), 1, _matlogger_buffer_size);
+    _dump_logger->create("red_ratio_nom", _jnt_list.size(), 1, _matlogger_buffer_size);
+
+
 
 }
 
 void CalibTrajReplayerRt::add_data2dump_logger()
 {
 
+
     _dump_logger->add("loop_time", _loop_time);
     _dump_logger->add("traj_time", _traj_time);
 
-    _dump_logger->add("q_p_meas", _q_p_meas);
-    _dump_logger->add("q_p_dot_meas", _q_p_dot_meas);
+    _dump_logger->add("jnt_cal_sol_millis", _jnt_cal_sol_millis);
+    _dump_logger->add("_alpha_d0", _alpha_d0);
+    _dump_logger->add("_alpha_d1", _alpha_d1);
+    _dump_logger->add("_alpha_inertial", _alpha_inertial);
+    _dump_logger->add("_alpha_kt", _alpha_kt);
+
+    _dump_logger->add("lambda", _lambda);
+    _dump_logger->add("lambda_des", _lambda_des);
+    _dump_logger->add("lambda_high", _lambda_high);
+
+    _dump_logger->add("q_p_dot_meas", _q_p_dot_meas_red_filt);
+    _dump_logger->add("q_p_ddot_meas", _q_p_ddot_meas_red_filt);
+    _dump_logger->add("tau_meas", _tau_meas_red_filt);
+    _dump_logger->add("iq_meas", _iq_meas_filt);
 
     _dump_logger->add("q_p_cmd", _q_p_cmd);
     _dump_logger->add("q_p_dot_cmd", _q_p_dot_cmd);
+    _dump_logger->add("q_p_ddot_cmd", _q_p_ddot_cmd);
+
+    _dump_logger->add("K_d0", _K_d0);
+    _dump_logger->add("K_d1", _K_d1);
+    _dump_logger->add("rot_MoI", _rot_MoI);
+    _dump_logger->add("K_t", _K_t);
+    _dump_logger->add("red_ratio", _red_ratio);
+
+    _dump_logger->add("K_d0_ig", _K_d0_ig_solv);
+    _dump_logger->add("K_d1_ig", _K_d1_ig_solv);
+    _dump_logger->add("rot_MoI_ig", _rot_MoI_ig_solv);
+    _dump_logger->add("K_t_ig", _K_t_ig_solv);
+
+    _dump_logger->add("K_d0_nom", _K_d0_nom);
+    _dump_logger->add("K_d1_nom", _K_d1_nom);
+    _dump_logger->add("rot_MoI_nom", _rot_MoI_nom);
+    _dump_logger->add("K_t_nom", _K_t_nom);
 
 }
 
