@@ -14,7 +14,7 @@ xbotcore_device_configs:
     ec_idle: $(rospack find concert_xbot2)/hal/ModularBot_ec_all.yaml
 
 xbotcore_threads:
-    rt_main:  {sched: fifo , prio: 60, period: 0.005, core_id: 1}
+    rt_main:  {sched: fifo , prio: 60, period: 0.01, core_id: 1}
     nrt_main: {sched: other, prio: 0 , period: 0.01}
 
 # plugins
@@ -33,9 +33,10 @@ xbotcore_plugins:
 
             verbose: {value: false, type: bool}
 
+            traj_execution_time: {value: 300.0, type: double}
+
             approach_traj_exec_time: {value: 10.0, type: double}
 
-            traj_execution_time: {value: 300.0, type: double}
             f0: {value: 0.1, type: double} # initial freq value for sweep calibration traj.
             ff: {value: 0.3, type: double} # final freq value for sweep calibration traj.
             t_exec_f: {value: 10.0, type: double} # time to ramp from f0 to ff
