@@ -1,0 +1,7 @@
+bool calibrate
+
+---
+
+string message
+
+bool success

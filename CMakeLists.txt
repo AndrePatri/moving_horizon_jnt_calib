@@ -18,8 +18,9 @@ option(XBOT2_ENABLE_XENO OFF "Compile against xenomai")
 
 add_service_files(
   FILES
-  JntCalibRt.srv
+  StartCalib.srv
   PerformCalibTraj.srv
+  SetCalibParams.srv
 )
 
 add_message_files(

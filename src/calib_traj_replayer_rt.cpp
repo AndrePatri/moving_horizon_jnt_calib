@@ -533,10 +533,16 @@ void CalibTrajReplayerRt::init_ros_bridge()
         this,
         &_queue);
 
-    _set_cal_srvr = _ros->advertiseService("set_jnt_cal",
-                                           &CalibTrajReplayerRt::on_jnt_cal_received,
+    _start_cal_srvr = _ros->advertiseService("start_jnt_cal",
+                                           &CalibTrajReplayerRt::on_start_cal_received,
                                            this,
                                            &_queue);
+
+    _set_cal_srvr = _ros->advertiseService("set_jnt_cal",
+                                           &CalibTrajReplayerRt::on_set_cal_received,
+                                           this,
+                                           &_queue);
+
     /* Publishers */
     moving_horizon_jnt_calib::CalibTrajStatus replay_st_prealloc;
     _traj_status_pub = _ros->advertise<moving_horizon_jnt_calib::CalibTrajStatus>(
@@ -769,8 +775,22 @@ bool CalibTrajReplayerRt::on_perform_traj_received(const moving_horizon_jnt_cali
 
 }
 
-bool CalibTrajReplayerRt::on_jnt_cal_received(const moving_horizon_jnt_calib::JntCalibRtRequest& req,
-                              moving_horizon_jnt_calib::JntCalibRtResponse& res)
+bool CalibTrajReplayerRt::on_start_cal_received(const moving_horizon_jnt_calib::StartCalibRequest& req,
+                              moving_horizon_jnt_calib::StartCalibResponse& res)
+{
+
+
+    _calibrate = req.calibrate;
+
+    res.success = true;
+
+    return res.success;
+
+}
+
+
+bool CalibTrajReplayerRt::on_set_cal_received(const moving_horizon_jnt_calib::SetCalibParamsRequest& req,
+                              moving_horizon_jnt_calib::SetCalibParamsResponse& res)
 {
 
 
@@ -792,29 +812,11 @@ bool CalibTrajReplayerRt::on_jnt_cal_received(const moving_horizon_jnt_calib::Jn
         err++;
     }
 
-    if(req.start && !req.stop && !_cal_req.start)
-    { // starting calibration (only if coming fro)
-
-        _start_calib = true;
-        _stop_calib = false;
-
-    }
-    if(req.stop && _cal_req.start && !_cal_req.stop)
-    { // stopping calibration (if calibration was already started and not stopped)
-        _start_calib = false;
-        _stop_calib = true;
-    }
-
-    _cal_req = req; // update message
-    _cal_req.start =  _start_calib;
-    _cal_req.stop = _stop_calib;
-
     res.success = true ? err == 0: false;
 
     return res.success;
 
 }
-
 
 void CalibTrajReplayerRt::run_jnt_calib()
 {
@@ -1067,7 +1069,11 @@ void CalibTrajReplayerRt::run()
         send_cmds(); // send commands to the robot
     }
 
-    run_jnt_calib(); // run moving horizon joint estimation
+    if(_calibrate)
+    {
+        run_jnt_calib(); // run moving horizon joint estimation
+    }
+
     get_calib_data(); // getting calibration data
 
     pub_replay_status(); // publishes info from the plugin to ros and internal xbot2 topics

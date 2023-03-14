@@ -15,9 +15,10 @@
 
 #include <moving_horizon_jnt_calib/CalibTrajStatus.h>
 #include <moving_horizon_jnt_calib/PerformCalibTraj.h>
+#include <moving_horizon_jnt_calib/SetCalibParams.h>
 
 #include <moving_horizon_jnt_calib/JntCalibStatus.h>
-#include <moving_horizon_jnt_calib/JntCalibRt.h>
+#include <moving_horizon_jnt_calib/StartCalib.h>
 
 #include <cartesian_interface/sdk/rt/LockfreeBufferImpl.h>
 #include <cartesian_interface/ros/RosServerClass.h>
@@ -88,7 +89,7 @@ private:
         _perform_traj = false, _traj_started = false, _traj_finished = false,
         _idle = true,
         _set_ig_to_prev_sol = true,
-        _start_calib = false, _stop_calib = false;
+        _calibrate = false;
 
     int _n_jnts_robot,
         _performed_traj_n = 0,
@@ -191,13 +192,14 @@ private:
     ServiceServerPtr<moving_horizon_jnt_calib::PerformCalibTrajRequest,
                      moving_horizon_jnt_calib::PerformCalibTrajResponse> _perform_traj_srvr;
 
-    ServiceServerPtr<moving_horizon_jnt_calib::JntCalibRtRequest,
-                     moving_horizon_jnt_calib::JntCalibRtResponse> _set_cal_srvr;
+    ServiceServerPtr<moving_horizon_jnt_calib::StartCalibRequest,
+                     moving_horizon_jnt_calib::StartCalibResponse> _start_cal_srvr;
+
+    ServiceServerPtr<moving_horizon_jnt_calib::SetCalibParamsRequest,
+                     moving_horizon_jnt_calib::SetCalibParamsResponse> _set_cal_srvr;
 
     PublisherPtr<moving_horizon_jnt_calib::CalibTrajStatus> _traj_status_pub;
     PublisherPtr<moving_horizon_jnt_calib::JntCalibStatus> _jnt_calib_pub;
-
-    moving_horizon_jnt_calib::JntCalibRtRequest _cal_req;
 
     SubscriberPtr<xbot_msgs::CustomState> _aux_signals_sub;
 
@@ -257,8 +259,11 @@ private:
     bool on_perform_traj_received(const moving_horizon_jnt_calib::PerformCalibTrajRequest& req,
                                   moving_horizon_jnt_calib::PerformCalibTrajResponse& res);
 
-    bool on_jnt_cal_received(const moving_horizon_jnt_calib::JntCalibRtRequest& req,
-                             moving_horizon_jnt_calib::JntCalibRtResponse& res);
+    bool on_start_cal_received(const moving_horizon_jnt_calib::StartCalibRequest& req,
+                             moving_horizon_jnt_calib::StartCalibResponse& res);
+
+    bool on_set_cal_received(const moving_horizon_jnt_calib::SetCalibParamsRequest& req,
+                             moving_horizon_jnt_calib::SetCalibParamsResponse& res);
 };
 
 #endif // CALIB_TRAJ_REPLAYER_RT

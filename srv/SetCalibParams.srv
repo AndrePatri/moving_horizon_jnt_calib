@@ -1,7 +1,3 @@
-bool start
-
-bool stop
-
 bool[] cal_mask
 
 float64[] lambda
