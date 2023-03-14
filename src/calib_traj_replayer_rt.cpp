@@ -147,8 +147,9 @@ void CalibTrajReplayerRt::init_vars()
     _K_d1_nom_vect = std::vector<double>(_jnt_list.size());
     _rot_MoI_nom_vect = std::vector<double>(_jnt_list.size());
 
-    _cal_mask_ros = std::vector<uint8_t>(4);
-    _cal_mask_des_ros = std::vector<uint8_t>(4);
+    _cal_mask = std::vector<bool>(_lambda_des.size());
+    _cal_mask_ros = std::vector<uint8_t>(_lambda_des.size());
+    _cal_mask_des_ros = std::vector<uint8_t>(_lambda_des.size());
 
     _lambda = Eigen::VectorXd::Zero(_lambda_des.size());
     _lambda_high_solv = Eigen::VectorXd::Zero(_lambda_des.size());
@@ -287,9 +288,11 @@ void CalibTrajReplayerRt::update_state()
     // extracting only relevant info
     for (int i = 0; i < _jnt_list.size(); i++)
     {
-        _q_p_dot_meas_red(i) = _q_p_dot_meas(_jnt_indxs[i]);
 
         _tau_meas_red(i) = _tau_meas(_jnt_indxs[i]);
+
+        _q_p_dot_meas_red(i) = _q_p_dot_meas(_jnt_indxs[i]);
+
 
     }
 
@@ -485,7 +488,7 @@ void CalibTrajReplayerRt::init_dump_logger()
 
     _dump_logger->add("traj_execution_time", _traj_execution_time);
 
-    _dump_logger->create("loop_time", 1);
+    _dump_logger->create("loop_time", 1, 1, _matlogger_buffer_size);
     _dump_logger->create("traj_time", 1, 1, _matlogger_buffer_size);
 
     _dump_logger->create("q_p_meas", _n_jnts_robot), 1, _matlogger_buffer_size;
@@ -507,11 +510,6 @@ void CalibTrajReplayerRt::add_data2dump_logger()
 
     _dump_logger->add("q_p_cmd", _q_p_cmd);
     _dump_logger->add("q_p_dot_cmd", _q_p_dot_cmd);
-
-    _dump_logger->add("plugin_time", _loop_time);
-
-
-
 
 }
 
@@ -834,7 +832,6 @@ void CalibTrajReplayerRt::run_jnt_calib()
 
 
     _rot_dyn_calib.solve();
-
 
 }
 
