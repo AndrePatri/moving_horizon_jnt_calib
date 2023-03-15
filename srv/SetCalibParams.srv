@@ -1,3 +1,5 @@
+bool set_ig_to_prev_sol
+
 bool[] cal_mask
 
 float64[] lambda_

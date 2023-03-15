@@ -672,6 +672,8 @@ bool MheRt::on_set_cal_received(const moving_horizon_jnt_calib::SetCalibParamsRe
         err++;
     }
 
+    _set_ig_to_prev_sol = req.set_ig_to_prev_sol;
+
     res.success = true;
 
     return res.success;
