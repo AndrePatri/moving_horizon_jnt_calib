@@ -89,15 +89,10 @@ private:
         _verbose = false,
         _go2calib_traj = false, _approach_traj_started = false, _approach_traj_finished = false,
         _perform_traj = false, _traj_started = false, _traj_finished = false,
-        _idle = true,
-        _set_ig_to_prev_sol = true,
-        _calibrate = false,
-        _force_iq_from_topic = false;
+        _idle = true;
 
     int _n_jnts_robot,
-        _performed_traj_n = 0,
-        _rot_calib_window_size = 10000,
-        _alpha = 5;
+        _performed_traj_n = 0;
 
     std::string _dump_mat_suffix = "traj_replay",
                 _hw_type,
@@ -109,9 +104,8 @@ private:
         _approach_traj_time = 0.0, _approach_traj_exec_time = 3.0, _approach_traj_phase = 0.0,
         _matlogger_buffer_size = 1e5,
         _omega0_s = 0, _omegaf_s = 0, _t_exec_omega_s = 10.0, _q_ub_s = 0.0, _q_lb_s = 0.0,
-        _q_temp, _q_dot_temp, _q_ddot_temp,
-        _sweep_min_t_exec = 0.5,
-        _q_dot_3sigma = 0.01;
+        _q_dot_temp, _q_ddot_temp,
+        _sweep_min_t_exec = 0.5;
 
     std::vector<std::string> _jnt_list;
     std::vector<int> _jnt_indxs;
@@ -129,62 +123,14 @@ private:
     std::vector<double> _omega_k;
     std::vector<double> _time_ref;
 
-    std::vector<bool> _cal_mask, _cal_mask_des;
-    std::vector<uint8_t> _cal_mask_ros, _cal_mask_des_ros;
-
     YAML::Node _jnt_cal_yaml;
 
-    Eigen::VectorXd _q_p_meas,
-                    _q_p_dot_meas,
-                    _q_p_ddot_meas,
-                    _tau_meas,
-                    _K_d0, _K_d1, _rot_MoI, _K_t, _red_ratio,
-                    _K_d0_ig, _K_d1_ig, _rot_MoI_ig, _K_t_ig,
-                    _K_d0_ig_solv, _K_d1_ig_solv, _rot_MoI_ig_solv, _K_t_ig_solv, // inernal (solver) value of ig
-                    _K_d0_nom, _K_d1_nom, _rot_MoI_nom, _K_t_nom,
+    Eigen::VectorXd _q_min, _q_max, _q_dot_lim,
+                    _q_p_init_appr_traj, _q_p_trgt_appr_traj,
                     _q_p_cmd, _q_p_dot_cmd, _q_p_ddot_cmd,
-                    _q_p_safe_cmd,
-                    _q_min, _q_max, _q_dot_lim,
-                    _q_p_init_appr_traj, _q_p_trgt_appr_traj;
-
-    Eigen::VectorXd _iq_meas, _iq_meas_filt,
-                    _q_p_dot_meas_red, _q_p_dot_meas_red_filt,
-                    _q_p_ddot_meas_red, _q_p_ddot_meas_red_filt,
-                    _tau_meas_red, _tau_meas_red_filt;
-
-    Eigen::VectorXd _jnt_cal_sol_millis,
-                    _alpha_d0, _alpha_d1, _alpha_inertial, _alpha_kt,
-                    _tau_friction, _tau_mot, _tau_inertial;
-
-    Eigen::VectorXd _lambda, _lambda_des,
-                    _lambda_high, _lambda_high_solv;
+                    _q_p_safe_cmd, _q_p_meas;
 
     std::vector<double> _q_p_cmd_vect, _q_p_dot_cmd_vect, _q_p_ddot_cmd_vect;
-
-    std::vector<double> _q_p_ddot_est_vect,
-                        _q_p_dot_meas_vect,
-                        _tau_meas_vect,
-                        _K_t_vect,
-                        _K_d0_vect,
-                        _K_d1_vect,
-                        _rot_MoI_vect,
-                        _red_ratio_vect,
-                        _alpha_d0_vect,
-                        _alpha_d1_vect,
-                        _alpha_inertial_vect,
-                        _alpha_kt_vect,
-                        _iq_meas_vect,
-                        _jnt_cal_sol_millis_vect,
-                        _lambda_vect, _lambda_des_vect, _lambda_high_vect;
-
-    std::vector<double> _K_t_ig_vect,
-                        _K_d0_ig_vect,
-                        _K_d1_ig_vect,
-                        _rot_MoI_ig_vect,
-                        _K_t_nom_vect,
-                        _K_d0_nom_vect,
-                        _K_d1_nom_vect,
-                        _rot_MoI_nom_vect;
 
     PeisekahTrans _peisekah_utils;
 
@@ -197,30 +143,7 @@ private:
     ServiceServerPtr<moving_horizon_jnt_calib::PerformCalibTrajRequest,
                      moving_horizon_jnt_calib::PerformCalibTrajResponse> _perform_traj_srvr;
 
-    ServiceServerPtr<moving_horizon_jnt_calib::StartCalibRequest,
-                     moving_horizon_jnt_calib::StartCalibResponse> _start_cal_srvr;
-
-    ServiceServerPtr<moving_horizon_jnt_calib::SetCalibParamsRequest,
-                     moving_horizon_jnt_calib::SetCalibParamsResponse> _set_cal_srvr;
-
     PublisherPtr<moving_horizon_jnt_calib::CalibTrajStatus> _traj_status_pub;
-    PublisherPtr<moving_horizon_jnt_calib::JntCalibStatus> _jnt_calib_pub;
-
-    SubscriberPtr<xbot_msgs::CustomState> _aux_signals_sub;
-
-    IqOutRosGetter _iq_getter;
-
-    IqEstimator _iq_estimator;
-
-    RotDynCal _rot_dyn_calib;
-
-    MovAvrgFilt _mov_avrg_filter_tau;
-    MovAvrgFilt _mov_avrg_filter_q_dot;
-    MovAvrgFilt _mov_avrg_filter_q_ddot;
-    int _mov_avrg_window_size = 10;
-    double _mov_avrg_cutoff_freq= 15.0;
-
-    NumDiff _num_diff;
 
     void get_params_from_config();
     void param_dims_ok_or_throw();
@@ -235,7 +158,6 @@ private:
     void saturate_cmds();
     
     void update_state();
-    void update_iq_estimation();
 
     void update_clocks();
 
@@ -254,21 +176,10 @@ private:
     void is_dummy(std::string dummy_string);
 
     void pub_replay_status();
-    void pub_calib_status();
-
-    void run_jnt_calib();
-    void get_calib_data();
-
-    void apply_calib_mask();
 
     bool on_perform_traj_received(const moving_horizon_jnt_calib::PerformCalibTrajRequest& req,
                                   moving_horizon_jnt_calib::PerformCalibTrajResponse& res);
 
-    bool on_start_cal_received(const moving_horizon_jnt_calib::StartCalibRequest& req,
-                             moving_horizon_jnt_calib::StartCalibResponse& res);
-
-    bool on_set_cal_received(const moving_horizon_jnt_calib::SetCalibParamsRequest& req,
-                             moving_horizon_jnt_calib::SetCalibParamsResponse& res);
 };
 
 #endif // CALIB_TRAJ_REPLAYER_RT

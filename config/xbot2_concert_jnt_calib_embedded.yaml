@@ -16,6 +16,7 @@ xbotcore_device_configs:
 
 xbotcore_threads:
     rt_main:  {sched: fifo , prio: 60, period: 0.001, core_id: 0}
+    mhe_thread:  {sched: fifo , prio: 60, period: 0.01, core_id: 1}
     nrt_main: {sched: other, prio: 0 , period: 0.005}
 
 # plugins
@@ -31,13 +32,13 @@ xbotcore_plugins:
 
     ec_ros: {thread: nrt_main, type: ec_ros}
 
-    # gcomp_example:
-    #     type: gcomp_example
-    #     thread: rt_main
-    #     params:
-    #         enabled_chains:
-    #             value: [chain_E]
-    #             type: vector<string>
+    gcomp_example:
+        type: gcomp_example
+        thread: rt_main
+        params:
+            enabled_chains:
+                value: [chain_E]
+                type: vector<string>
 
     traj_replayer:
         thread: rt_main
@@ -50,7 +51,16 @@ xbotcore_plugins:
 
             approach_traj_exec_time: {value: 10.0, type: double}
 
-            jnt_cal_yaml: {value: $PWD/jnt_cal_concert.yaml, type: yamlfile}
+            jnt_cal_yaml: {value: $PWD/jnt_mhe_traj_concert.yaml, type: yamlfile}
+
+    mhe:
+        thread: mhe_thread
+        type: mhe_rt
+        params:
+
+            verbose: {value: false, type: bool}
+
+            jnt_cal_yaml: {value: $PWD/jnt_mhe_opt_concert.yaml, type: yamlfile}
 
             force_iq_from_topic: {value: true, type: bool}
 

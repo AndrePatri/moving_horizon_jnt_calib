@@ -42,6 +42,12 @@ target_include_directories(calib_traj_replayer_rt PRIVATE include src ${matlogge
 add_dependencies(calib_traj_replayer_rt ${PROJECT_NAME}_generate_messages)
 target_link_libraries(calib_traj_replayer_rt PRIVATE awesome_utils::awesome_utils xbot2::xbot2_ros_support matlogger2::matlogger2)
 
+add_xbot2_plugin(mhe_rt
+    src/mhe_rt.cpp)
+target_include_directories(mhe_rt PRIVATE include src ${matlogger2_INCLUDE_DIRS})
+add_dependencies(mhe_rt ${PROJECT_NAME}_generate_messages)
+target_link_libraries(mhe_rt PRIVATE awesome_utils::awesome_utils xbot2::xbot2_ros_support matlogger2::matlogger2)
+
 add_executable(calib_logger src/calib_logger.cpp)
 target_link_libraries(calib_logger ${catkin_LIBRARIES} ${XBotInterface_LIBRARIES} matlogger2::matlogger2)
 target_include_directories(calib_logger PRIVATE ${catkin_INCLUDE_DIRS} ${XBotInterface_INCLUDE_DIRS} ${xbot_msgs_INCLUDE_DIRS})
@@ -55,6 +61,7 @@ target_link_libraries(start_calib_traj PRIVATE awesome_utils::awesome_utils xbot
 install(
     TARGETS
     calib_traj_replayer_rt
+    mhe_rt
     DESTINATION lib
 )
 
