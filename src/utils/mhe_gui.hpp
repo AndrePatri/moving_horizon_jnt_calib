@@ -12,24 +12,22 @@
 #include <moving_horizon_jnt_calib/SetCalibParams.h>
 #include <moving_horizon_jnt_calib/JntCalibStatus.h>
 
-//class MheGui : public QWidget {
-//    Q_OBJECT
-//public:
-//    MheGui(QWidget *parent = nullptr);
+class MheGui : public QWidget {
 
-//    virtual ~MyWidget();
+public:
+    MheGui(ros::NodeHandle& nh);
 
-//public slots:
-//    void onSliderMoved(int value);
+public:
+    void sendMheState(std::vector<double> value);
 
-//    void callback(const std_msgs::Int32::ConstPtr &msg);
+    void mheStateCallback(const moving_horizon_jnt_calib::JntCalibStatus::ConstPtr& cal_status);
 
-//private:
-//    ros::NodeHandle nh_;
-//    ros::Subscriber sub_;
-//    ros::ServiceClient client_;
-
-//    QSlider *slider_;
-//};
+private:
+    ros::NodeHandle nh_;
+    ros::ServiceClient set_mhe_params_client;
+    ros::Subscriber mhe_status_sub_;
+    moving_horizon_jnt_calib::SetCalibParams mhe_param_req;
+    QSlider* slider_;
+};
 
 #endif // MHE_GUI_HPP
