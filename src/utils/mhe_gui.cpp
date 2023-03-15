@@ -11,19 +11,32 @@ MheGui::MheGui(ros::NodeHandle& nh)
   mhe_status_sub_ = nh_.subscribe("/mhe/jnt_calib_status", 1, &MheGui::mheStateCallback, this);
 
   // Create the GUI elements
-  slider_ = new QSlider(Qt::Horizontal);
-  slider_->setRange(0, 100);
-  slider_->setValue(50);
+  slider_lambda_ = new QSlider(Qt::Horizontal);
+  slider_lambda_->setRange(0, 100);
+  slider_lambda_->setValue(50);
+  slider_lambda_->setSingleStep(1);
 
-  QVBoxLayout* layout = new QVBoxLayout();
-  layout->addWidget(slider_);
+  QLabel *lb = new QLabel("0", this);
+  QLabel *ub = new QLabel("100", this);
+
+  slider_lambda_high_ = new QSlider(Qt::Horizontal);
+  slider_lambda_high_->setRange(0, 100);
+  slider_lambda_high_->setValue(50);
+
+//  QVBoxLayout* layout = new QVBoxLayout();
+  QGridLayout* layout = new QGridLayout;
+
+  layout->addWidget(slider_lambda_, 0, 0, 1, 4);
+  layout->addWidget(lb, 1, 0, 1, 1);
+  layout->addWidget(ub, 1, 4, 1, 1);
+  layout->addWidget(slider_lambda_high_, 2, 0, 1, 4);
 
   setLayout(layout);
 
-  connect(slider_, SIGNAL(valueChanged(int)), this, SLOT(sendMheState(std::vector<double> value)));
+  connect(slider_lambda_, SIGNAL(valueChanged(int)), this, SLOT(sendMheState(std::vector<double> value)));
+  connect(slider_lambda_high_, SIGNAL(valueChanged(int)), this, SLOT(sendMheState(std::vector<double> value)));
 
 }
-
 
 void MheGui::sendMheState(std::vector<double> value)
 {

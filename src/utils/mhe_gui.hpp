@@ -6,6 +6,7 @@
 #include <ros/subscriber.h>
 #include <QWidget>
 #include <QSlider>
+#include <QLabel>
 #include <QVBoxLayout>
 #include <QApplication>
 
@@ -27,7 +28,9 @@ private:
     ros::ServiceClient set_mhe_params_client;
     ros::Subscriber mhe_status_sub_;
     moving_horizon_jnt_calib::SetCalibParams mhe_param_req;
-    QSlider* slider_;
+    QSlider* slider_lambda_;
+    QSlider* slider_lambda_high_;
+
 };
 
 #endif // MHE_GUI_HPP
