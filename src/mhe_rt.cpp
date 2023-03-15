@@ -424,6 +424,8 @@ void MheRt::pub_calib_status()
 
     status_msg->msg().jnt_names = _jnt_list;
 
+    status_msg->msg().is_window_full = _rot_dyn_calib.is_window_full();
+
     for(int i = 0; i < _jnt_list.size(); i++)
     {
         _iq_meas_vect[i] = _iq_meas_filt(i);

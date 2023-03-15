@@ -34,4 +34,6 @@ float64[] lambda_high
 bool[] cal_mask
 bool[] cal_mask_des
 
+bool is_window_full
+
 string[] jnt_names

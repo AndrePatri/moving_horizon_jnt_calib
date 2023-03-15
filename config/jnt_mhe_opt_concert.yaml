@@ -5,7 +5,7 @@ cal_mask: [false, true, true, false] # which components of rotor's dynamics to c
 lambda: [0.1, 0.001, 0.001, 0.1]
 lambda_high: [1e14, 1e6, 1e6, 1e14]
 mov_avrg_cutoff_freq: 5.0
-set_ig_to_prev_sol: false
+set_ig_to_prev_sol: true
 
 # ****** SINGLE JOINT ****** #
 
