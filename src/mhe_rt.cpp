@@ -693,8 +693,8 @@ void MheRt::run_jnt_calib()
                               _tau_meas_red_filt); // adding latest state for calibration
 
 
-    if(_calibrate)
-    {
+    if(_calibrate && _rot_dyn_calib.is_window_full())
+    {// we start solving only if the window was completely filled with data
         _rot_dyn_calib.solve();
     }
 
@@ -908,8 +908,9 @@ void MheRt::run()
 
     update_clocks(); // last, update the clocks (loop + any additional one). Each clock is incremented by a plugin dt
 
-    if(_set_ig_to_prev_sol)
-    {
+    if(_set_ig_to_prev_sol && _calibrate && _rot_dyn_calib.is_window_full())
+    { // we do this only is calibrating and if the window is full
+      // we check is_window_full() to ensure we only solve when the window is full
         _K_t_ig = _K_t;
         _K_d0_ig = _K_d0;
         _K_d1_ig = _K_d1;
