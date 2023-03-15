@@ -48,12 +48,12 @@ target_include_directories(mhe_rt PRIVATE include src ${matlogger2_INCLUDE_DIRS}
 add_dependencies(mhe_rt ${PROJECT_NAME}_generate_messages)
 target_link_libraries(mhe_rt PRIVATE awesome_utils::awesome_utils xbot2::xbot2_ros_support matlogger2::matlogger2)
 
-add_executable(calib_logger src/calib_logger.cpp)
+add_executable(calib_logger src/utils/calib_logger.cpp)
 target_link_libraries(calib_logger ${catkin_LIBRARIES} ${XBotInterface_LIBRARIES} matlogger2::matlogger2)
 target_include_directories(calib_logger PRIVATE ${catkin_INCLUDE_DIRS} ${XBotInterface_INCLUDE_DIRS} ${xbot_msgs_INCLUDE_DIRS})
 set_target_properties(calib_logger PROPERTIES INSTALL_RPATH_USE_LINK_PATH TRUE)
 
-add_executable(start_calib_traj src/start_calib_trajectory.cpp)
+add_executable(start_calib_traj src/utils/start_calib_trajectory.cpp)
 target_include_directories(start_calib_traj PRIVATE include src ${matlogger2_INCLUDE_DIRS})
 add_dependencies(start_calib_traj ${PROJECT_NAME}_generate_messages)
 target_link_libraries(start_calib_traj PRIVATE awesome_utils::awesome_utils xbot2::xbot2_ros_support matlogger2::matlogger2)
@@ -66,4 +66,4 @@ install(
 )
 
 install(TARGETS calib_logger start_calib_traj DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
-install(PROGRAMS src/launch_rosbag.sh DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
+install(PROGRAMS src/utils/launch_rosbag.sh DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
