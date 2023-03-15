@@ -888,7 +888,9 @@ bool CalibTrajReplayerRt::on_set_cal_received(const moving_horizon_jnt_calib::Se
 
     int err = 0;
 
-    if(req.cal_mask.size() == req.lambda_.size() == req.lambda_high.size() == _lambda_des.size())
+    if(req.cal_mask.size() == req.lambda_.size() &&
+       req.lambda_.size() == req.lambda_high.size() &&
+       req.lambda_high.size() == _lambda_des.size())
     {
 
         for (int i = 0; i < _lambda_des.size(); i++)
@@ -925,7 +927,10 @@ void CalibTrajReplayerRt::run_jnt_calib()
                               _tau_meas_red_filt); // adding latest state for calibration
 
 
-    _rot_dyn_calib.solve();
+    if(_calibrate)
+    {
+        _rot_dyn_calib.solve();
+    }
 
 }
 
@@ -1161,11 +1166,8 @@ void CalibTrajReplayerRt::run()
         send_cmds(); // send commands to the robot
     }
 
-    if(_calibrate)
-    {
-        run_jnt_calib(); // run moving horizon joint estimation
-    }
 
+    run_jnt_calib(); // run moving horizon joint estimation
     get_calib_data(); // getting calibration data
 
     pub_replay_status(); // publishes info from the plugin to ros and internal xbot2 topics
