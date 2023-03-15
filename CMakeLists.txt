@@ -14,6 +14,11 @@ find_package(matlogger2 REQUIRED)
 
 find_package(catkin REQUIRED roscpp rospy urdf sensor_msgs std_msgs message_generation)
 
+find_package(Qt5 COMPONENTS Core Gui Widgets REQUIRED)
+if(NOT Qt5_FOUND)
+    message(WARNING "Qt5 package not found, the MHE-gui will not be built")
+endif()
+
 option(XBOT2_ENABLE_XENO OFF "Compile against xenomai")
 
 add_service_files(
@@ -58,6 +63,15 @@ target_include_directories(start_calib_traj PRIVATE include src ${matlogger2_INC
 add_dependencies(start_calib_traj ${PROJECT_NAME}_generate_messages)
 target_link_libraries(start_calib_traj PRIVATE awesome_utils::awesome_utils xbot2::xbot2_ros_support matlogger2::matlogger2)
 
+if(Qt5_FOUND)
+
+    add_executable(mhe_gui src/utils/mhe_gui.cpp)
+    target_include_directories(mhe_gui PRIVATE ${catkin_INCLUDE_DIRS} src/utils)
+    add_dependencies(mhe_gui ${PROJECT_NAME}_generate_messages)
+    target_link_libraries(mhe_gui PRIVATE awesome_utils::awesome_utils Qt5::Core Qt5::Gui Qt5::Widgets ${catkin_LIBRARIES})
+
+endif()
+
 install(
     TARGETS
     calib_traj_replayer_rt
@@ -66,4 +80,11 @@ install(
 )
 
 install(TARGETS calib_logger start_calib_traj DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
+
+if(Qt5_FOUND)
+
+    install(TARGETS mhe_gui DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
+
+endif()
+
 install(PROGRAMS src/utils/launch_rosbag.sh DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
