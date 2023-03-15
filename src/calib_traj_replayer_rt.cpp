@@ -888,13 +888,13 @@ bool CalibTrajReplayerRt::on_set_cal_received(const moving_horizon_jnt_calib::Se
 
     int err = 0;
 
-    if(req.cal_mask.size() == req.lambda.size() == req.lambda_high.size() == _lambda_des.size())
+    if(req.cal_mask.size() == req.lambda_.size() == req.lambda_high.size() == _lambda_des.size())
     {
 
         for (int i = 0; i < _lambda_des.size(); i++)
         {
             _cal_mask_des[i] = req.cal_mask[i];
-            _lambda_des(i) = req.lambda[i];
+            _lambda_des(i) = req.lambda_[i];
             _lambda_high(i) = req.lambda_high[i];
         }
 
