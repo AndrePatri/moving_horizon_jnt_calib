@@ -136,6 +136,9 @@ void MheRt::get_params_from_config()
                                  lambda_high.size());
     _red_ratio = Eigen::VectorXd::Map(red_ratio.data(),
                                  red_ratio.size());
+    _red_ratio = _red_ratio.array().inverse(); // to comply with internal
+    // conventions that 0 < red_ratio <= 1
+
     _K_t_ig = Eigen::VectorXd::Map(K_t_ig.data(),
                                  K_t_ig.size());
     _rot_MoI_ig = Eigen::VectorXd::Map(rot_MoI_ig.data(),
