@@ -14,7 +14,7 @@ xbotcore_device_configs:
     ec_idle: $(rospack find concert_xbot2)/hal/ModularBot_ec_all.yaml
 
 xbotcore_threads:
-    rt_main:  {sched: fifo , prio: 60, period: 0.01, core_id: 0}
+    rt_main:  {sched: fifo , prio: 60, period: 0.05, core_id: 0}
     nrt_main: {sched: other, prio: 0 , period: 0.01}
 
 # plugins

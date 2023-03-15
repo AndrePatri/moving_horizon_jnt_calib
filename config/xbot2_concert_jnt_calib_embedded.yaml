@@ -1,0 +1,117 @@
+XBotInterface:
+ urdf_path: $(rospack find modularbot)/urdf/ModularBot.urdf
+ srdf_path: $(rospack find modularbot)/srdf/ModularBot.srdf
+ joint_map_path: $(rospack find modularbot)/joint_map/ModularBot_joint_map.yaml
+
+ModelInterface:
+  model_type: RBDL
+  is_model_floating_base: true
+
+# hal
+xbotcore_device_configs:
+    sim: $(rospack find modularbot)/config/hal/ModularBot_gz.yaml
+    dummy: $(rospack find modularbot)/config/hal/ModularBot_dummy.yaml
+    ec_imp: $(rospack find modularbot)/config/hal/ModularBot_ec_all.yaml
+    ec_idle: $(rospack find modularbot)/config/hal/ModularBot_ec_all.yaml
+
+xbotcore_threads:
+    rt_main:  {sched: fifo , prio: 60, period: 0.001, core_id: 0}
+    nrt_main: {sched: other, prio: 0 , period: 0.005}
+
+# plugins
+xbotcore_plugins:
+
+    ros_io: {thread: nrt_main, type: ros_io}
+
+    ros_ctrl: {thread: nrt_main, type: ros_control}
+
+    homing:
+        thread: rt_main
+        type: homing
+
+    ec_ros: {thread: nrt_main, type: ec_ros}
+
+    gcomp_example:
+        type: gcomp_example
+        thread: rt_main
+        params:
+            enabled_chains:
+                value: [chain_E]
+                type: vector<string>
+
+    # traj_replayer:
+    #     thread: rt_main
+    #     type: calib_traj_replayer_rt
+    #     params:
+
+    #         verbose: {value: false, type: bool}
+
+    #         traj_execution_time: {value: 600.0, type: double}
+
+    #         approach_traj_exec_time: {value: 10.0, type: double}
+
+    #         rot_calib_window_size: {value: 10000, type: int}
+    #         alpha: {value: 5, type: int}
+    #         q_dot_3sigma: {value: 0.01, type: double}
+    #         cal_mask: {value: [false, true, true, false], type: vector<bool>} # which components of rotor's dynamics to calibrate: [K_t, K_d0, K_d1, rot_MoI]
+    #         lambda: {value: [0.1, 0.001, 0.001, 0.1], type: Eigen::VectorXd}
+    #         lambda_high: {value: [1e14, 1e6, 1e6, 1e14], type: Eigen::VectorXd}
+    #         mov_avrg_cutoff_freq: {value: 5.0, type: double} # [Hz]
+    #         set_ig_to_prev_sol: {value: true, type: bool}
+
+    #         # jnt_list: {value: ["J1_E", "J2_E", "J3_E", "J4_E", "J5_E"], type: vector<string>} # joints to be moved
+
+    #         # q_ub: {value: [2.5, 1, 2.5, 1, 2.5], type: vector<double>}
+    #         # q_lb: {value: [-2.5, -1, -2.5, -1, -2.5], type: vector<double>}
+
+    #         # red_ratio: {value: [0.00625, 0.00625, 0.0083333, 0.00625, 0.0083333], type: Eigen::VectorXd}  # gear reduction ratio of the actuator (always <=1)
+
+    #         # f0: {value: 0.05, type: double} # initial freq value for sweep calibration traj.
+    #         # ff: {value: 0.1, type: double} # final freq value for sweep calibration traj.
+    #         # t_exec_f: {value: 10.0, type: double} # time to ramp from f0 to ff
+
+    #         # K_t: {value: [0.14, 0.14, 0.14, 0.14, 0.14], type: Eigen::VectorXd}
+    #         # rotor_MoI: {value: [3.26e-4, 3.26e-4, 1.51e-4, 3.26e-4, 1.51e-4], type: Eigen::VectorXd}
+    #         # K_d0: {value: [0.0, 0.0, 0.0, 0.0, 0.0], type: Eigen::VectorXd}
+    #         # K_d1: {value: [0.0, 0.0, 0.0, 0.0, 0.0], type: Eigen::VectorXd}
+
+    #         # K_t_ig: {value: [0.14, 0.14, 0.14, 0.14, 0.14], type: Eigen::VectorXd}
+    #         # rot_MoI_ig: {value: [3.26e-4, 3.26e-4, 1.51e-4, 3.26e-4, 1.51e-4], type: Eigen::VectorXd}
+    #         # K_d0_ig: {value: [0.0, 0.0, 0.0, 0.0, 0.0], type: Eigen::VectorXd} # initial guess for the static friction torque coefficient ( tau_d0 = K_d* sign(joint_vel) )
+    #         # K_d1_ig: {value: [0.0, 0.0, 0.0, 0.0, 0.0], type: Eigen::VectorXd} # initial guess for the dynamical friction torque coefficient ( tau_d1 = K_d* joint_vel )
+
+    #         # K_t_nom: {value: [0.14, 0.14, 0.14, 0.14, 0.14], type: Eigen::VectorXd}
+    #         # rot_MoI_nom: {value: [3.26e-4, 3.26e-4, 1.51e-4, 3.26e-4, 1.51e-4], type: Eigen::VectorXd}
+    #         # K_d0_nom: {value: [0.0, 0.0, 0.0, 0.0, 0.0], type: Eigen::VectorXd} # initial guess for the static friction torque coefficient ( tau_d0 = K_d* sign(joint_vel) )
+    #         # K_d1_nom: {value: [0.0, 0.0, 0.0, 0.0, 0.0], type: Eigen::VectorXd} # initial guess for the dynamical friction torque coefficient ( tau_d1 = K_d* joint_vel )
+
+    #         jnt_list: {value: ["J2_E"], type: vector<string>} # joints to be moved
+
+    #         q_ub: {value: [1], type: vector<double>}
+    #         q_lb: {value: [-1], type: vector<double>}
+
+    #         red_ratio: {value: [0.00625], type: Eigen::VectorXd}  # gear reduction ratio of the actuator (always <=1)
+
+    #         f0: {value: 0.05, type: double} # initial freq value for sweep calibration traj.
+    #         ff: {value: 0.1, type: double} # final freq value for sweep calibration traj.
+    #         t_exec_f: {value: 10.0, type: double} # time to ramp from f0 to ff
+
+    #         K_t: {value: [0.14], type: Eigen::VectorXd}
+    #         rotor_MoI: {value: [3.26e-4], type: Eigen::VectorXd}
+    #         K_d0: {value: [0.0], type: Eigen::VectorXd}
+    #         K_d1: {value: [0.0], type: Eigen::VectorXd}
+
+    #         K_t_ig: {value: [0.14], type: Eigen::VectorXd}
+    #         rot_MoI_ig: {value: [3.26e-4], type: Eigen::VectorXd}
+    #         K_d0_ig: {value: [0.0], type: Eigen::VectorXd} # initial guess for the static friction torque coefficient ( tau_d0 = K_d* sign(joint_vel) )
+    #         K_d1_ig: {value: [0.0], type: Eigen::VectorXd} # initial guess for the dynamical friction torque coefficient ( tau_d1 = K_d* joint_vel )
+
+    #         K_t_nom: {value: [0.14], type: Eigen::VectorXd}
+    #         rot_MoI_nom: {value: [3.26e-4], type: Eigen::VectorXd}
+    #         K_d0_nom: {value: [0.0], type: Eigen::VectorXd} # initial guess for the static friction torque coefficient ( tau_d0 = K_d* sign(joint_vel) )
+    #         K_d1_nom: {value: [0.0], type: Eigen::VectorXd} # initial guess for the dynamical friction torque coefficient ( tau_d1 = K_d* joint_vel )
+
+# global parameters
+xbotcore_param:
+    /jm/tx_filter_autostart: {value: true, type: bool}
+    /jm/tx_filter_cutoff: {value: 2.0, type: double}
