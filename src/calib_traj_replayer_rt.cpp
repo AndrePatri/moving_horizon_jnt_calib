@@ -170,44 +170,70 @@ void CalibTrajReplayerRt::get_params_from_config()
 
     _approach_traj_exec_time = getParamOrThrow<double>("~approach_traj_exec_time");
 
-    _jnt_list = getParamOrThrow<std::vector<std::string>>("~jnt_list");
+    _jnt_cal_yaml = getParamOrThrow<YAML::Node>("~jnt_cal_yaml/content");
 
-    _omega0_s = 2 * M_PI * getParamOrThrow<double>("~f0");
-    _omegaf_s = 2 * M_PI * getParamOrThrow<double>("~ff");
+    _jnt_list = _jnt_cal_yaml["jnt_list"].as<std::vector<std::string>>();
 
-    if(getParamOrThrow<double>("~f0") >= 1/_sweep_min_t_exec )
+    _omega0_s = 2 * M_PI * _jnt_cal_yaml["f0"].as<double>();
+    _omegaf_s = 2 * M_PI * _jnt_cal_yaml["ff"].as<double>();
+
+    if(_jnt_cal_yaml["f0"].as<double>() >= 1/_sweep_min_t_exec )
     {
         _omega0_s  = 2 * M_PI * 1/_sweep_min_t_exec;
     }
-    if(getParamOrThrow<double>("~ff") >= 1/_sweep_min_t_exec )
+    if(_jnt_cal_yaml["ff"].as<double>() >= 1/_sweep_min_t_exec )
     {
         _omegaf_s = 2 * M_PI * 1/_sweep_min_t_exec;
     }
 
-    _t_exec_omega_s = getParamOrThrow<double>("~t_exec_f");
-    _q_lb = getParamOrThrow<std::vector<double>>("~q_lb");
-    _q_ub = getParamOrThrow<std::vector<double>>("~q_ub");
+    _t_exec_omega_s = _jnt_cal_yaml["t_exec_f"].as<double>();
+    _q_lb = _jnt_cal_yaml["q_lb"].as<std::vector<double>>();
+    _q_ub = _jnt_cal_yaml["q_ub"].as<std::vector<double>>();
 
-    _cal_mask_des = getParamOrThrow<std::vector<bool>>("~cal_mask");
-    _rot_calib_window_size = getParamOrThrow<int>("~rot_calib_window_size");
-    _lambda_des = getParamOrThrow<Eigen::VectorXd>("~lambda");
-    _lambda_high = getParamOrThrow<Eigen::VectorXd>("~lambda_high");
+    _cal_mask_des = _jnt_cal_yaml["cal_mask"].as<std::vector<bool>>();
+    _rot_calib_window_size = _jnt_cal_yaml["rot_calib_window_size"].as<int>();
 
-    _alpha = getParamOrThrow<int>("~alpha");
-    _q_dot_3sigma = getParamOrThrow<double>("~q_dot_3sigma");
-    _mov_avrg_cutoff_freq = getParamOrThrow<double>("~mov_avrg_cutoff_freq");
+    _alpha = _jnt_cal_yaml["alpha"].as<int>();
+    _q_dot_3sigma = _jnt_cal_yaml["q_dot_3sigma"].as<double>();
+    _mov_avrg_cutoff_freq = _jnt_cal_yaml["mov_avrg_cutoff_freq"].as<double>();
 
-    _red_ratio = getParamOrThrow<Eigen::VectorXd>("~red_ratio");
-    _K_t_ig = getParamOrThrow<Eigen::VectorXd>("~K_t_ig");
-    _rot_MoI_ig = getParamOrThrow<Eigen::VectorXd>("~rot_MoI_ig");
-    _K_d0_ig = getParamOrThrow<Eigen::VectorXd>("~K_d0_ig");
-    _K_d1_ig = getParamOrThrow<Eigen::VectorXd>("~K_d1_ig");
-    _K_t_nom = getParamOrThrow<Eigen::VectorXd>("~K_t_nom");
-    _rot_MoI_nom = getParamOrThrow<Eigen::VectorXd>("~rot_MoI_nom");
-    _K_d0_nom = getParamOrThrow<Eigen::VectorXd>("~K_d0_nom");
-    _K_d1_nom = getParamOrThrow<Eigen::VectorXd>("~K_d1_nom");
+    auto lambda_des = _jnt_cal_yaml["lambda"].as<std::vector<double>>();
+    auto lambda_high = _jnt_cal_yaml["lambda_high"].as<std::vector<double>>();
+    auto red_ratio = _jnt_cal_yaml["red_ratio"].as<std::vector<double>>();
+    auto K_t_ig = _jnt_cal_yaml["K_t_ig"].as<std::vector<double>>();
+    auto rot_MoI_ig = _jnt_cal_yaml["rot_MoI_ig"].as<std::vector<double>>();
+    auto K_d0_ig = _jnt_cal_yaml["K_d0_ig"].as<std::vector<double>>();
+    auto K_d1_ig = _jnt_cal_yaml["K_d1_ig"].as<std::vector<double>>();
+    auto K_t_nom = _jnt_cal_yaml["K_t_nom"].as<std::vector<double>>();
+    auto rot_MoI_nom = _jnt_cal_yaml["rot_MoI_nom"].as<std::vector<double>>();
+    auto K_d0_nom = _jnt_cal_yaml["K_d0_nom"].as<std::vector<double>>();
+    auto K_d1_nom = _jnt_cal_yaml["K_d1_nom"].as<std::vector<double>>();
 
-    _set_ig_to_prev_sol = getParamOrThrow<bool>("~set_ig_to_prev_sol");
+    // mappint to VectorXd
+    _lambda_des = Eigen::VectorXd::Map(lambda_des.data(),
+                                 lambda_des.size());
+    _lambda_high = Eigen::VectorXd::Map(lambda_high.data(),
+                                 lambda_high.size());
+    _red_ratio = Eigen::VectorXd::Map(red_ratio.data(),
+                                 red_ratio.size());
+    _K_t_ig = Eigen::VectorXd::Map(K_t_ig.data(),
+                                 K_t_ig.size());
+    _rot_MoI_ig = Eigen::VectorXd::Map(rot_MoI_ig.data(),
+                                 rot_MoI_ig.size());
+    _K_d0_ig = Eigen::VectorXd::Map(K_d0_ig.data(),
+                                 K_d0_ig.size());
+    _K_d1_ig = Eigen::VectorXd::Map(K_d1_ig.data(),
+                                 K_d1_ig.size());
+    _K_t_nom = Eigen::VectorXd::Map(K_t_nom.data(),
+                                 K_t_nom.size());
+    _rot_MoI_nom = Eigen::VectorXd::Map(rot_MoI_nom.data(),
+                                 rot_MoI_nom.size());
+    _K_d0_nom = Eigen::VectorXd::Map(K_d0_nom.data(),
+                                 K_d0_nom.size());
+    _K_d1_nom = Eigen::VectorXd::Map(K_d1_nom.data(),
+                                 K_d1_nom.size());
+
+    _set_ig_to_prev_sol = _jnt_cal_yaml["set_ig_to_prev_sol"].as<bool>();
 
     param_dims_ok_or_throw();
 }

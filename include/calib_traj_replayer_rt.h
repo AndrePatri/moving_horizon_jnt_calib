@@ -1,6 +1,8 @@
 #ifndef CALIB_TRAJ_REPLAYER_RT
 #define CALIB_TRAJ_REPLAYER_RT
 
+#include <yaml-cpp/yaml.h>
+
 #include <matlogger2/matlogger2.h>
 
 #include <xbot2/xbot2.h>
@@ -128,6 +130,8 @@ private:
 
     std::vector<bool> _cal_mask, _cal_mask_des;
     std::vector<uint8_t> _cal_mask_ros, _cal_mask_des_ros;
+
+    YAML::Node _jnt_cal_yaml;
 
     Eigen::VectorXd _q_p_meas,
                     _q_p_dot_meas,
