@@ -91,7 +91,8 @@ private:
         _perform_traj = false, _traj_started = false, _traj_finished = false,
         _idle = true,
         _set_ig_to_prev_sol = true,
-        _calibrate = false;
+        _calibrate = false,
+        _force_iq_from_topic = false;
 
     int _n_jnts_robot,
         _performed_traj_n = 0,

@@ -172,6 +172,8 @@ void CalibTrajReplayerRt::get_params_from_config()
 
     _jnt_cal_yaml = getParamOrThrow<YAML::Node>("~jnt_cal_yaml/content");
 
+    _force_iq_from_topic = getParamOrThrow<bool>("~force_iq_from_topic");
+
     _jnt_list = _jnt_cal_yaml["jnt_list"].as<std::vector<std::string>>();
 
     _omega0_s = 2 * M_PI * _jnt_cal_yaml["f0"].as<double>();
@@ -326,7 +328,7 @@ void CalibTrajReplayerRt::update_state()
     _num_diff.add_sample(_q_p_dot_meas_red);
     _num_diff.dot(_q_p_ddot_meas_red);
 
-    if(_is_sim || _is_dummy)
+    if((_is_sim || _is_dummy) && !_force_iq_from_topic)
     {
         update_iq_estimation();
 

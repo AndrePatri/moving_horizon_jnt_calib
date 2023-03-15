@@ -52,6 +52,8 @@ xbotcore_plugins:
 
             jnt_cal_yaml: {value: $PWD/jnt_cal_concert.yaml, type: yamlfile}
 
+            force_iq_from_topic: {value: true, type: bool}
+
 # global parameters
 xbotcore_param:
     /jm/tx_filter_autostart: {value: true, type: bool}
