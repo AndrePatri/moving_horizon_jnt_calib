@@ -888,16 +888,11 @@ bool CalibTrajReplayerRt::on_set_cal_received(const moving_horizon_jnt_calib::Se
 
     int err = 0;
 
-    if(req.cal_mask.size() == req.lambda_.size() &&
-       req.lambda_.size() == req.lambda_high.size() &&
-       req.lambda_high.size() == _lambda_des.size())
-    {
-
+    if(req.cal_mask.size() == _lambda_des.size())
+    { // we can set the calibration mask
         for (int i = 0; i < _lambda_des.size(); i++)
         {
             _cal_mask_des[i] = req.cal_mask[i];
-            _lambda_des(i) = req.lambda_[i];
-            _lambda_high(i) = req.lambda_high[i];
         }
 
     }
@@ -906,7 +901,139 @@ bool CalibTrajReplayerRt::on_set_cal_received(const moving_horizon_jnt_calib::Se
         err++;
     }
 
-    res.success = true ? err == 0: false;
+    if(req.lambda_.size() == _lambda_des.size())
+    {
+
+        for (int i = 0; i < _lambda_des.size(); i++)
+        {
+            _lambda_des(i) = req.lambda_[i];
+        }
+
+    }
+    else
+    {
+        err++;
+    }
+
+    if(req.lambda_high.size() == _lambda_des.size())
+    {
+
+        for (int i = 0; i < _lambda_des.size(); i++)
+        {
+            _lambda_high(i) = req.lambda_high[i];
+        }
+
+    }
+    else
+    {
+        err++;
+    }
+    if(req.Kd0_ig.size() == _jnt_list.size())
+    {
+
+        for (int i = 0; i < _jnt_list.size(); i++)
+        {
+            _K_d0_ig(i) = req.Kd0_ig[i];
+        }
+
+    }
+    else
+    {
+        err++;
+    }
+    if(req.Kd0_nom.size() == _jnt_list.size())
+    {
+
+        for (int i = 0; i < _jnt_list.size(); i++)
+        {
+            _K_d0_nom(i) = req.Kd0_nom[i];
+        }
+
+    }
+    else
+    {
+        err++;
+    }
+    if(req.Kd1_ig.size() == _jnt_list.size())
+    {
+
+        for (int i = 0; i < _jnt_list.size(); i++)
+        {
+            _K_d1_ig(i) = req.Kd1_ig[i];
+        }
+
+    }
+    else
+    {
+        err++;
+    }
+    if(req.Kd1_nom.size() == _jnt_list.size())
+    {
+
+        for (int i = 0; i < _jnt_list.size(); i++)
+        {
+            _K_d1_nom(i) = req.Kd1_nom[i];
+        }
+
+    }
+    else
+    {
+        err++;
+    }
+    if(req.rot_MoI_ig.size() == _jnt_list.size())
+    {
+
+        for (int i = 0; i < _jnt_list.size(); i++)
+        {
+            _rot_MoI_ig(i) = req.rot_MoI_ig[i];
+        }
+
+    }
+    else
+    {
+        err++;
+    }
+    if(req.rot_MoI_nom.size() == _jnt_list.size())
+    {
+
+        for (int i = 0; i < _jnt_list.size(); i++)
+        {
+            _rot_MoI_nom(i) = req.rot_MoI_nom[i];
+        }
+
+    }
+    else
+    {
+        err++;
+    }
+    if(req.K_t_ig.size() == _jnt_list.size())
+    {
+
+        for (int i = 0; i < _jnt_list.size(); i++)
+        {
+            _K_t_ig(i) = req.K_t_ig[i];
+        }
+
+    }
+    else
+    {
+        err++;
+    }
+    if(req.K_t_nom.size() == _jnt_list.size())
+    {
+
+        for (int i = 0; i < _jnt_list.size(); i++)
+        {
+            _K_t_nom(i) = req.K_t_nom[i];
+        }
+
+    }
+    else
+    {
+        err++;
+    }
+
+    res.success = true;
 
     return res.success;
 

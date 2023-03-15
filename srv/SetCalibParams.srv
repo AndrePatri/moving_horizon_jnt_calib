@@ -4,6 +4,16 @@ float64[] lambda_
 
 float64[] lambda_high
 
+float64[] Kd0_ig
+float64[] Kd1_ig
+float64[] rot_MoI_ig
+float64[] K_t_ig
+
+float64[] Kd0_nom
+float64[] Kd1_nom
+float64[] rot_MoI_nom
+float64[] K_t_nom
+
 ---
 
 string message
