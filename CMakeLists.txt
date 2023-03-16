@@ -12,6 +12,12 @@ find_package(xbot2 REQUIRED)
 find_package(cartesian_interface REQUIRED)
 find_package(matlogger2 REQUIRED)
 
+set(EC_CLIENT_SKIP_ECAT_MASTER TRUE) #hack
+find_package(ec_xbot2_client QUIET)
+if(ec_xbot2_client_FOUND)
+  add_definitions(-DEC_XBOT2_CLIENT_FOUND)
+endif()
+
 find_package(catkin REQUIRED roscpp rospy urdf sensor_msgs std_msgs message_generation)
 
 find_package(Qt5 COMPONENTS Core Gui Widgets REQUIRED)

@@ -22,6 +22,10 @@
 #include <moving_horizon_jnt_calib/JntCalibStatus.h>
 #include <moving_horizon_jnt_calib/StartCalib.h>
 
+#if defined(EC_XBOT2_CLIENT_FOUND)
+#include <ec_xbot2/joint_ec.h>
+#endif
+
 #include <cartesian_interface/sdk/rt/LockfreeBufferImpl.h>
 #include <cartesian_interface/ros/RosServerClass.h>
 
@@ -169,7 +173,12 @@ private:
 
     PublisherPtr<moving_horizon_jnt_calib::JntCalibStatus> _jnt_calib_pub;
 
+
+    #if defined(EC_XBOT2_CLIENT_FOUND)
+    SubscriberPtr<XBot::Hal::JointEcAux> _aux_signals_sub;
+    #else
     SubscriberPtr<xbot_msgs::CustomState> _aux_signals_sub;
+    #endif
 
     IqOutRosGetter _iq_getter;
 

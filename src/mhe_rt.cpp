@@ -409,11 +409,30 @@ void MheRt::init_ros_bridge()
         "jnt_calib_status", 1, jnt_cal_st_prealloc);
 
     /* Subscribers */
-    _aux_signals_sub = _ros->subscribe("/xbotcore/aux",
+
+    if(_is_sim || _is_dummy)
+    {
+    #if defined(EC_XBOT2_CLIENT_FOUND)
+
+    // we use internal topics for mininum latency
+    _aux_signals_sub = subscribe("/hal/joint_ec/aux",
                                 &Xbot2Utils::IqOutRosGetter::on_aux_signal_received,
                                 &_iq_getter,
                                 1,  // queue size
                                 &_queue);
+
+    }
+    #else
+
+    // we use ros topics(high latency)
+    _aux_signals_sub = _ros->subscribe("/xbotcore/aux",
+                                &Xbot2Utils::IqOutRosGetter::on_aux_signal_received_ros,
+                                &_iq_getter,
+                                1,  // queue size
+                                &_queue);
+
+    }
+   #endif
 
 }
 
