@@ -65,9 +65,9 @@ target_include_directories(calib_logger PRIVATE ${catkin_INCLUDE_DIRS} ${XBotInt
 set_target_properties(calib_logger PROPERTIES INSTALL_RPATH_USE_LINK_PATH TRUE)
 
 add_executable(start_calib_traj src/utils/start_calib_trajectory.cpp)
-target_include_directories(start_calib_traj PRIVATE include src ${matlogger2_INCLUDE_DIRS})
+target_include_directories(start_calib_traj PRIVATE include src ${matlogger2_INCLUDE_DIRS} ${catkin_INCLUDE_DIRS})
 add_dependencies(start_calib_traj ${PROJECT_NAME}_generate_messages)
-target_link_libraries(start_calib_traj PRIVATE awesome_utils::awesome_utils xbot2::xbot2_ros_support matlogger2::matlogger2)
+target_link_libraries(start_calib_traj PRIVATE awesome_utils::awesome_utils xbot2::xbot2_ros_support matlogger2::matlogger2 ${catkin_LIBRARIES})
 
 if(Qt5_FOUND)
 

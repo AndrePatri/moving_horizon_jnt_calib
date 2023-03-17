@@ -860,7 +860,10 @@ bool MheRt::on_initialize()
 
     // initializing calibration-related stuff
 
-    _iq_getter = IqOutRosGetter(_jnt_list, _plugin_dt, _mov_avrg_cutoff_freq); // getter for quadrature current measurements from ros topic
+    _iq_getter = IqOutRosGetter(_jnt_list,
+                                _plugin_dt,
+                                _mov_avrg_cutoff_freq,
+                                _verbose); // getter for quadrature current measurements from ros topic
 
     //filter for tau_meas
     _mov_avrg_filter_tau = MovAvrgFilt(_jnt_list.size(), _plugin_dt, _mov_avrg_cutoff_freq);
@@ -898,7 +901,7 @@ bool MheRt::on_initialize()
                                 _red_ratio,
                                 _alpha,
                                 _q_dot_3sigma,
-                                false); // object to compute iq estimate
+                                _verbose); // object to compute iq estimate
     return true;
 
 }
