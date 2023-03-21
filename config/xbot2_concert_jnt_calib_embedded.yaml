@@ -62,7 +62,9 @@ xbotcore_plugins:
 
             jnt_cal_yaml: {value: $PWD/jnt_mhe_opt_concert.yaml, type: yamlfile}
 
-            force_iq_from_topic: {value: true, type: bool}
+            force_iq_from_topic: {value: false, type: bool}
+
+            queue_size: {value: 100, type: int}
 
 # global parameters
 xbotcore_param:

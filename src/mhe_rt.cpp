@@ -108,6 +108,8 @@ void MheRt::get_params_from_config()
 
     _force_iq_from_topic = getParamOrThrow<bool>("~force_iq_from_topic");
 
+    _queue_size = getParamOrThrow<int>("~queue_size");
+
     _jnt_list = _jnt_cal_yaml["jnt_list"].as<std::vector<std::string>>();
 
     _cal_mask_des = _jnt_cal_yaml["cal_mask"].as<std::vector<bool>>();
@@ -418,7 +420,7 @@ void MheRt::init_ros_bridge()
     _aux_signals_sub = subscribe("/hal/joint_ec/aux",
                                 &Xbot2Utils::IqOutRosGetter::on_aux_signal_received,
                                 &_iq_getter,
-                                1,  // queue size
+                                100,  // queue size
                                 &_queue);
 
     }
@@ -428,7 +430,7 @@ void MheRt::init_ros_bridge()
     _aux_signals_sub = _ros->subscribe("/xbotcore/aux",
                                 &Xbot2Utils::IqOutRosGetter::on_aux_signal_received_ros,
                                 &_iq_getter,
-                                1,  // queue size
+                                100,  // queue size
                                 &_queue);
 
     }

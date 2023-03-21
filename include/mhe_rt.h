@@ -90,7 +90,8 @@ private:
 
     int _n_jnts_robot,
         _rot_calib_window_size = 10000,
-        _alpha = 5;
+        _alpha = 5,
+        _queue_size = 20;
 
     std::string _dump_mat_suffix = "mhr_rt",
                 _hw_type,
