@@ -12,11 +12,17 @@ void CalibTrajReplayerRt::init_clocks()
 
 }
 
-void CalibTrajReplayerRt::reset_clocks()
+void CalibTrajReplayerRt::reset()
 {
 
     _traj_time = 0.0;
     _approach_traj_time = 0.0;
+
+    for (int i = 0; i < _jnt_list.size(); i++)
+    {
+        _sweep_trajs[i].reset();
+
+    }
 
 }
 
@@ -184,7 +190,7 @@ void CalibTrajReplayerRt::update_state()
     _robot->sense();
 
     // Getting robot state
-    _robot->getJointPosition(_q_p_meas);
+    _robot->getPositionReference(_q_p_meas);
 
 }
 
@@ -270,7 +276,7 @@ void CalibTrajReplayerRt::set_cmds()
             _approach_traj_finished = true;
             _approach_traj_started = false;
 
-            reset_clocks();
+            reset();
 
             jhigh().jprint(fmt::fg(fmt::terminal_color::blue),
                    std::string("\n Approach trajectory finished... ready to perform calibration trajectory \n"));
@@ -300,7 +306,7 @@ void CalibTrajReplayerRt::set_cmds()
             _traj_finished = true;
             _traj_started = false;
 
-            reset_clocks();
+            reset();
 
             jhigh().jprint(fmt::fg(fmt::terminal_color::blue),
                    std::string("\n Calibration trajectory finished\n"));
@@ -476,7 +482,7 @@ bool CalibTrajReplayerRt::on_perform_traj_received(const moving_horizon_jnt_cali
 
     if(success && _go2calib_traj)
     {
-        reset_clocks();
+        reset();
 
         _q_p_init_appr_traj = _q_p_cmd;
         _q_p_trgt_appr_traj = _q_p_cmd;
@@ -494,15 +500,35 @@ bool CalibTrajReplayerRt::on_perform_traj_received(const moving_horizon_jnt_cali
         _approach_traj_started = true;
 
         _approach_traj_finished = false;
+
+        if(_verbose)
+        {
+            jhigh().jprint(fmt::fg(fmt::terminal_color::magenta),
+                          "CalibTrajReplayerRt: starting approach trajectory\n");
+        }
+
     }
 
     if(success && _perform_traj)
     { // only if the approach traj. was already executed
-        reset_clocks();
+        reset();
 
         _traj_started = true;
 
         _traj_finished = false;
+    }
+
+    if(success && !_perform_traj)
+    { // when stopping the traj, we reset the flags
+        reset();
+
+        _traj_started = false;
+
+        _traj_finished = false;
+
+        _approach_traj_started = false;
+
+        _approach_traj_finished = false;
     }
 
     res.success = success;

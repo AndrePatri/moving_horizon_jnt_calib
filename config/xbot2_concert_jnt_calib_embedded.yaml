@@ -45,7 +45,7 @@ xbotcore_plugins:
         type: calib_traj_replayer_rt
         params:
 
-            verbose: {value: false, type: bool}
+            verbose: {value: true, type: bool}
 
             traj_execution_time: {value: 600.0, type: double}
 

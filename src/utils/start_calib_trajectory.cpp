@@ -56,6 +56,7 @@ class StartCalibTraj
 
         bool _approach_traj_finished  = false;
         bool _traj_finished = false;
+        bool _traj_started = false;
         bool _traj_sign_already_sent = false;
         bool _approach_sign_already_sent = false;
 
@@ -94,10 +95,11 @@ class StartCalibTraj
             _approach_traj_finished = msg.approach_traj_finished;
 
             _traj_finished = msg.traj_finished;
+            _traj_started = msg.traj_started;
 
-            print_traj_status();
+//            print_traj_status();
 
-            if(!_approach_traj_finished && !_traj_finished && !_pause_started && !_approach_sign_already_sent)
+            if(!_approach_traj_finished && !_traj_finished && !_approach_sign_already_sent)
             { // sending approach trajectory start signal
                 if (_client.call(_go2_init_conf))
                 {
@@ -113,7 +115,7 @@ class StartCalibTraj
                 _approach_sign_already_sent = true;
             }
 
-            if(_approach_traj_finished  && !_traj_finished && !_pause_started && !_traj_sign_already_sent)
+            if(_approach_traj_finished  && !_traj_finished  && !_traj_sign_already_sent)
             { // sending trajectory start signal
                 if (_client.call(_start_cal_traj))
                 {
@@ -129,31 +131,36 @@ class StartCalibTraj
                 _traj_sign_already_sent = true;
             }
 
-            if(_approach_traj_finished  && _traj_finished && !_pause_started)
+            if(_approach_traj_finished && _traj_started)
             {
-                _timer.reset() ;
-                _pause_started = true;
+                ros::shutdown();
             }
 
-            if(_pause_started)
-            {
-                double elapsed_seconds = _timer.seconds_elapsed();
+//            if(_approach_traj_finished  && _traj_started && !_pause_started)
+//            {
+//                _timer.reset() ;
+//                _pause_started = true;
+//            }
 
-                if( elapsed_seconds > _replay_pause_time)
-                {
-                    _timer.reset() ;
-                    _pause_started = false; // trigger next jump sequence
-                    _approach_sign_already_sent = false;
-                    _traj_sign_already_sent = false;
+//            if(_pause_started)
+//            {
+//                double elapsed_seconds = _timer.seconds_elapsed();
 
-                    ROS_INFO("\n Pause ended\n");
+//                if( elapsed_seconds > _replay_pause_time)
+//                {
+//                    _timer.reset() ;
+//                    _pause_started = false; // trigger next jump sequence
+//                    _approach_sign_already_sent = false;
+//                    _traj_sign_already_sent = false;
 
-                }
-                else
-                {
-                    ROS_INFO("\n Pause timer: %f s\n", elapsed_seconds);
-                }
-            }
+//                    ROS_INFO("\n Pause ended\n");
+
+//                }
+//                else
+//                {
+//                    ROS_INFO("\n Pause timer: %f s\n", elapsed_seconds);
+//                }
+//            }
 
         }
 
@@ -163,7 +170,6 @@ class StartCalibTraj
 
             ROS_INFO("\n Approach_traj_finished: %i\n", (int)_approach_traj_finished);
             ROS_INFO("\n traj_finished: %i\n", (int)_traj_finished);
-            ROS_INFO("\n _pause_started: %i\n", (int)_pause_started);
 
             std::cout << "" << std::endl;
         }
