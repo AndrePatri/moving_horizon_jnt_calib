@@ -12,17 +12,11 @@ void CalibTrajReplayerRt::init_clocks()
 
 }
 
-void CalibTrajReplayerRt::reset()
+void CalibTrajReplayerRt::reset_clocks()
 {
 
     _traj_time = 0.0;
     _approach_traj_time = 0.0;
-
-    for (int i = 0; i < _jnt_list.size(); i++)
-    {
-        _sweep_trajs[i].reset();
-
-    }
 
 }
 
@@ -276,7 +270,7 @@ void CalibTrajReplayerRt::set_cmds()
             _approach_traj_finished = true;
             _approach_traj_started = false;
 
-            reset();
+            reset_clocks();
 
             jhigh().jprint(fmt::fg(fmt::terminal_color::blue),
                    std::string("\n Approach trajectory finished... ready to perform calibration trajectory \n"));
@@ -306,7 +300,7 @@ void CalibTrajReplayerRt::set_cmds()
             _traj_finished = true;
             _traj_started = false;
 
-            reset();
+            reset_clocks();
 
             jhigh().jprint(fmt::fg(fmt::terminal_color::blue),
                    std::string("\n Calibration trajectory finished\n"));
@@ -482,7 +476,7 @@ bool CalibTrajReplayerRt::on_perform_traj_received(const moving_horizon_jnt_cali
 
     if(success && _go2calib_traj)
     {
-        reset();
+        reset_clocks();
 
         _q_p_init_appr_traj = _q_p_cmd;
         _q_p_trgt_appr_traj = _q_p_cmd;
@@ -511,16 +505,21 @@ bool CalibTrajReplayerRt::on_perform_traj_received(const moving_horizon_jnt_cali
 
     if(success && _perform_traj)
     { // only if the approach traj. was already executed
-        reset();
+        reset_clocks();
 
         _traj_started = true;
 
         _traj_finished = false;
+
+        for (int i = 0; i < _jnt_list.size(); i++)
+        {
+            _sweep_trajs[i].reset();
+        }
     }
 
     if(success && !_perform_traj)
     { // when stopping the traj, we reset the flags
-        reset();
+        reset_clocks();
 
         _traj_started = false;
 

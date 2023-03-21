@@ -153,7 +153,7 @@ private:
     void init_ros_bridge();
     void init_dump_logger();
 
-    void reset();
+    void reset_clocks();
 
     void saturate_cmds();
     
