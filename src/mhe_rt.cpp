@@ -412,8 +412,6 @@ void MheRt::init_ros_bridge()
 
     /* Subscribers */
 
-    if(_is_sim || _is_dummy)
-    {
     #if defined(EC_XBOT2_CLIENT_FOUND)
 
     // we use internal topics for mininum latency
@@ -423,7 +421,6 @@ void MheRt::init_ros_bridge()
                                 100,  // queue size
                                 &_queue);
 
-    }
     #else
 
     // we use ros topics(high latency)
