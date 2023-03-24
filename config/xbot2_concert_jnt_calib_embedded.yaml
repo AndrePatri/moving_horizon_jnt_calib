@@ -13,6 +13,7 @@ xbotcore_device_configs:
     dummy: $(rospack find modularbot)/config/hal/ModularBot_dummy.yaml
     ec_imp: $(rospack find modularbot)/config/hal/ModularBot_ec_all.yaml
     ec_idle: $(rospack find modularbot)/config/hal/ModularBot_ec_all.yaml
+    ec_pos: $(rospack find modularbot)/config/hal/ModularBot_ec_all.yaml
 
 xbotcore_threads:
     rt_main:  {sched: fifo , prio: 60, period: 0.001, core_id: 0}
