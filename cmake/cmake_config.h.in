@@ -1,0 +1,6 @@
+#ifndef CMAKE_CONFIG_H_IN
+#define CMAKE_CONFIG_H_IN
+
+#define UI_FULL_PATH "@UI_FULL_PATH@"
+
+#endif // CMAKE_CONFIG_H_INcmak

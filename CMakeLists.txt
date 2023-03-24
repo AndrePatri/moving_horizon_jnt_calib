@@ -3,6 +3,10 @@ project(moving_horizon_jnt_calib)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
+set(CMAKE_DEF_CONFIG_FNAME cmake_config) # set config file name
+set(CMAKE_DEF_CONFIG_GENDIR ${CMAKE_CURRENT_BINARY_DIR}/generated) # set config file name
+configure_file(cmake/${CMAKE_DEF_CONFIG_FNAME}.h.in ${CMAKE_DEF_CONFIG_GENDIR}/${CMAKE_DEF_CONFIG_FNAME}.h)
+
 find_package(xbot2 REQUIRED)
 find_package(matlogger2 REQUIRED)
 find_package(Eigen3 REQUIRED)
@@ -20,9 +24,13 @@ endif()
 
 find_package(catkin REQUIRED roscpp rospy urdf sensor_msgs std_msgs message_generation)
 
-find_package(Qt5 COMPONENTS Core Gui Widgets REQUIRED)
+find_package(Qt5 COMPONENTS Core Gui Widgets QUIET)
 if(NOT Qt5_FOUND)
     message(WARNING "Qt5 package not found, the MHE-gui will not be built")
+endif()
+find_package(Qt6 COMPONENTS Core Gui Widgets QUIET)
+if(NOT Qt6_FOUND)
+    message(WARNING "Qt6 package not found")
 endif()
 
 option(XBOT2_ENABLE_XENO OFF "Compile against xenomai")
@@ -69,14 +77,40 @@ target_include_directories(start_calib_traj PRIVATE include src ${matlogger2_INC
 add_dependencies(start_calib_traj ${PROJECT_NAME}_generate_messages)
 target_link_libraries(start_calib_traj PRIVATE awesome_utils::awesome_utils xbot2::xbot2_ros_support matlogger2::matlogger2 ${catkin_LIBRARIES})
 
+# GUI
 if(Qt5_FOUND)
 
-    add_executable(mhe_gui src/utils/mhe_gui.cpp)
-    target_include_directories(mhe_gui PRIVATE ${catkin_INCLUDE_DIRS} src/utils)
-    add_dependencies(mhe_gui ${PROJECT_NAME}_generate_messages)
-    target_link_libraries(mhe_gui PRIVATE awesome_utils::awesome_utils Qt5::Core Qt5::Gui Qt5::Widgets ${catkin_LIBRARIES})
+    set(UI_PATH "${CMAKE_CURRENT_SOURCE_DIR}/src/utils/gui/qt/")
+    set(UI_NAME "mhe_gui.ui")
+    set(UI_FULL_PATH "${UI_PATH}${UI_NAME}")
+
+    set(CMAKE_AUTOMOC ON)
+    set(CMAKE_AUTOUIC ON)
+    set(CMAKE_AUTORCC ON)
+
+    add_executable(mhe_gui src/utils/gui/qt/main.cpp)
+    target_include_directories(mhe_gui PRIVATE ${catkin_INCLUDE_DIRS})
+    target_link_libraries(mhe_gui PUBLIC awesome_utils::awesome_utils ${catkin_LIBRARIES}
+                                         Qt5::Core
+                                         Qt5::Gui
+                                         Qt5::Widgets)
+
+    install(TARGETS mhe_gui DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
+
+    install(FILES ${CMAKE_DEF_CONFIG_GENDIR}/${CMAKE_DEF_CONFIG_FNAME}.h
+        DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${PROJECT_NAME}
+    )
 
 endif()
+
+#if(Qt5_FOUND)
+
+#    add_executable(mhe_gui src/utils/mhe_gui.cpp)
+#    target_include_directories(mhe_gui PRIVATE ${catkin_INCLUDE_DIRS} src/utils)
+#    add_dependencies(mhe_gui ${PROJECT_NAME}_generate_messages)
+#    target_link_libraries(mhe_gui PRIVATE awesome_utils::awesome_utils Qt5::Core Qt5::Gui Qt5::Widgets ${catkin_LIBRARIES})
+
+#endif()
 
 install(
     TARGETS
@@ -86,11 +120,5 @@ install(
 )
 
 install(TARGETS calib_logger start_calib_traj DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
-
-if(Qt5_FOUND)
-
-    install(TARGETS mhe_gui DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
-
-endif()
 
 install(PROGRAMS src/utils/launch_rosbag.sh DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
