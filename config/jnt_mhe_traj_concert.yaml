@@ -8,6 +8,6 @@ jnt_list: ["J2_E"] # joints to be moved
 q_ub: [1]
 q_lb: [-1]
 
-f0: 0.05 # initial freq value for sweep calibration traj.
-ff: 0.1 # final freq value for sweep calibration traj.
+f0: 0.1 # initial freq value for sweep calibration traj.
+ff: 0.3 # final freq value for sweep calibration traj.
 t_exec_f: 30.0 # time to ramp from f0 to ff
