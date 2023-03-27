@@ -1,4 +1,4 @@
-#include <moving_horizon_jnt_calib/cmake_config.h>"
+#include "cmake_config.h"
 
 #include <QApplication>
 #include <QMainWindow>

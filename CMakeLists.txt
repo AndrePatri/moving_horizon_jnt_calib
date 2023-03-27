@@ -3,10 +3,6 @@ project(moving_horizon_jnt_calib)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
-set(CMAKE_DEF_CONFIG_FNAME cmake_config) # set config file name
-set(CMAKE_DEF_CONFIG_GENDIR ${CMAKE_CURRENT_BINARY_DIR}/generated) # set config file name
-configure_file(cmake/${CMAKE_DEF_CONFIG_FNAME}.h.in ${CMAKE_DEF_CONFIG_GENDIR}/${CMAKE_DEF_CONFIG_FNAME}.h)
-
 find_package(xbot2 REQUIRED)
 find_package(matlogger2 REQUIRED)
 find_package(Eigen3 REQUIRED)
@@ -77,7 +73,6 @@ target_include_directories(start_calib_traj PRIVATE include src ${matlogger2_INC
 add_dependencies(start_calib_traj ${PROJECT_NAME}_generate_messages)
 target_link_libraries(start_calib_traj PRIVATE awesome_utils::awesome_utils xbot2::xbot2_ros_support matlogger2::matlogger2 ${catkin_LIBRARIES})
 
-# GUI
 if(Qt5_FOUND)
 
     set(UI_PATH "${CMAKE_CURRENT_SOURCE_DIR}/src/utils/gui/qt/")
@@ -88,8 +83,19 @@ if(Qt5_FOUND)
     set(CMAKE_AUTOUIC ON)
     set(CMAKE_AUTORCC ON)
 
+endif()
+
+# after having set all variables and before installing stuff, we can set the configuration file
+# which is used to access cmake variables from the headers at compile time
+set(CMAKE_DEF_CONFIG_FNAME cmake_config) # set config file name
+set(CMAKE_DEF_CONFIG_GENDIR ${CMAKE_CURRENT_BINARY_DIR}/generated) # set config file name
+configure_file(cmake/${CMAKE_DEF_CONFIG_FNAME}.h.in ${CMAKE_DEF_CONFIG_GENDIR}/${CMAKE_DEF_CONFIG_FNAME}.h)
+
+if(Qt5_FOUND)
+
     add_executable(mhe_gui src/utils/gui/qt/main.cpp)
-    target_include_directories(mhe_gui PRIVATE ${catkin_INCLUDE_DIRS})
+
+    target_include_directories(mhe_gui PRIVATE ${catkin_INCLUDE_DIRS} ${CMAKE_DEF_CONFIG_GENDIR})
     target_link_libraries(mhe_gui PUBLIC awesome_utils::awesome_utils ${catkin_LIBRARIES}
                                          Qt5::Core
                                          Qt5::Gui
@@ -97,9 +103,9 @@ if(Qt5_FOUND)
 
     install(TARGETS mhe_gui DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 
-    install(FILES ${CMAKE_DEF_CONFIG_GENDIR}/${CMAKE_DEF_CONFIG_FNAME}.h
-        DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${PROJECT_NAME}
-    )
+#    install(FILES ${CMAKE_DEF_CONFIG_GENDIR}/${CMAKE_DEF_CONFIG_FNAME}.h
+#        DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${PROJECT_NAME}
+#    )
 
 endif()
 
