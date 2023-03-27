@@ -429,8 +429,6 @@ void MheRt::init_ros_bridge()
                                 &_iq_getter,
                                 100,  // queue size
                                 &_queue);
-
-    }
    #endif
 
 }
