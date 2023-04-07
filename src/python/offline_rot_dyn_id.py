@@ -32,13 +32,17 @@ def main(args):
     
     a = True
 
+def calibrate():
+
+    rot_dyn_cal = OfflineRotDynCal(args.data_basepath)
+
+
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser(
         description='Script to perform rotor dynamics calibration with offline-data')
 
-    parser.add_argument('--data_basepath', '-dpath', type=str, default=rospkg.RosPack().get_path(
-        "moving_horizon_jnt_calib") + "/description/urdf" + "/" + "awesome_leg_test_rig" + ".urdf")
+    parser.add_argument('--data_basepath', '-dpath', type=str, default="/media/andreap/super_storage/mhe_bags/robot_state_log__0_2023_03_24__17_47_38.mat")
     
     parser.add_argument('--gnagna', '-gnagna', type=str2bool, \
                         help='', default=True)
@@ -48,6 +52,8 @@ if __name__ == '__main__':
     rospackage = rospkg.RosPack()  # Only for taking the path to the leg package
 #    exec_path = rospackage.get_path("awesome_leg") + "/src/horizon_code""
 
-    os.mkdir(args.results_dir)
+    # os.mkdir(args.results_dir)
+
+    calibrate()
 
     main(args)
