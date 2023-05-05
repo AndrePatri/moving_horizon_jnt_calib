@@ -2,6 +2,7 @@ import matlogger2.matlogger as log
 import awesome_utils.awesome_pyutils as cal_utils
 import matlogger2.matlogger as log_utils
 import yaml
+import numpy as np
 
 def str2bool(v: str):
   #susendberg's function
@@ -23,6 +24,18 @@ class OfflineRotDynCal:
     self.load_config()
     self.load_data_from_mat()
     self.init_calibrator()
+
+    self.n_jnts = len(self.red_ratio)
+
+    self.cal_windows = []
+    self.kd0_opt = []
+    self.kd1_opt =  []
+    self.kt_opt = []
+    self.rot_moi_opt = []
+    self.regr_error = []
+    self.sol_millis = []
+
+    self.current_window = {}
 
   def load_config(self):
 
@@ -59,6 +72,22 @@ class OfflineRotDynCal:
 
     self.varnames = self.logger.get_varnames()
 
+    self.q_dot = self.logger.readvar("q_p_dot_meas")
+    self.q_ddot = self.logger.readvar("q_p_ddot_meas")
+    self.tau_meas = self.logger.readvar("tau_meas")
+    self.iq_meas = self.logger.readvar("iq_meas")
+
+    err = 0
+    if (self.q_dot.shape[1] != self.q_ddot.shape[1]):
+      err +=1
+    if (self.q_ddot.shape[1] != self.tau_meas.shape[1]):
+      err +=1
+    if (self.tau_meas.shape[1] != self.iq_meas.shape[1]):
+      err +=1
+
+    if err != 0:
+      raise Exception("OfflineRotDynCal.load_data_from_matThe loaded(): the number of samples in the loaded data do not match!!!") 
+    
   def init_calibrator(self):
 
     self.rot_dyn_cal = cal_utils.RotDynCal(self.window_size, 
@@ -95,13 +124,55 @@ class OfflineRotDynCal:
     # data time series (this method allows to slide through the data back and forth
     # and test the results of the calibration at different times)
 
+    self.rot_dyn_cal.reset_window() # we tell the calibrator that
+    # we want to fill the window again (in case it was already filled with 
+    # other data)
+    self.current_window_index = index
+    i = self.current_window_index
     while(not self.rot_dyn_cal.is_window_full()):
+      
+      # we stop adding samples when the window is full
+      self.rot_dyn_cal.add_sample(self.q_dot[:, i], 
+                                  self.q_ddot[:, i], 
+                                  self.tau_meas[:, i], 
+                                  self.iq_meas[:, i])
+      
+      i += 1
 
-      self.rot_dyn_cal.add_sample(q_dot_filt, 
-                                  q_ddot_filt, 
-                                  iq_meas, 
-                                  )
+    self.current_window["q_dot"] = \
+      self.q_dot[:, self.current_window_index: self.current_window_index + self.window_size]
+    self.current_window["q_ddot"] = \
+      self.q_ddot[:, self.current_window_index: self.current_window_index + self.window_size]
+    self.current_window["tau_meas"] = \
+      self.tau_meas[:, self.current_window_index: self.current_window_index + self.window_size]
+    self.current_window["iq_meas"] = \
+      self.iq_meas[:, self.current_window_index: self.current_window_index + self.window_size]
 
+  def run_calibration(self):
+
+    if(self.rot_dyn_cal.is_window_full()):
+      
+      self.rot_dyn_cal.solve()
+
+      self.cal_windows.append(self.current_window)
+
+      self.rot_dyn_cal.reset_window() # we force a call to fill_window_from_sample
+      # before the solve method can be called again
+    
+    else:
+
+      print("run_calibration(): calibration will not be run. You have to finish filling the data window first!")
+
+  def retrieve_solution_data(self):
+
+    self.regr_error.append(self.rot_dyn_cal.get_regr_error())
+    self.sol_millis.append(self.rot_dyn_cal.get_sol_millis())
+
+    self.kd0_opt.append(self.rot_dyn_cal.get_opt_Kd0())
+    self.kd1_opt.append(self.rot_dyn_cal.get_opt_Kd1())
+    self.kt_opt.append(self.rot_dyn_cal.get_opt_Kt())
+    self.rot_moi_opt.append(self.rot_dyn_cal.get_opt_rot_MoI())
+    
     
 
   

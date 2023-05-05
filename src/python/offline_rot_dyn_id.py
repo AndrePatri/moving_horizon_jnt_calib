@@ -32,15 +32,19 @@ sol_mat_basename = "awesome_jump"
 rospack = rospkg.RosPack()
 package_path = rospack.get_path("moving_horizon_jnt_calib")
 
-def main(args):
-    
-    a = True
-
 def calibrate():
         
     rot_dyn_cal = OfflineRotDynCal(args.data_basepath, 
                                    args.config_path)
+    
+    rot_dyn_cal.fill_window_from_sample(0)
 
+    rot_dyn_cal.run_calibration()
+
+    rot_dyn_cal.retrieve_solution_data()
+
+    print(rot_dyn_cal.sol_millis)
+    
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser(
@@ -57,5 +61,3 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     calibrate()
-
-    main(args)
