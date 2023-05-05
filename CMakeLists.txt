@@ -128,3 +128,5 @@ install(
 install(TARGETS calib_logger start_calib_traj DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 
 install(PROGRAMS src/utils/launch_rosbag.sh DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
+
+install(FILES config/jnt_mhe_opt_concert.yaml DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/config)

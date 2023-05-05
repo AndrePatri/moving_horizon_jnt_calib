@@ -15,6 +15,8 @@ import shutil
 from datetime import datetime
 from datetime import date
 
+import yaml
+
 file_name = os.path.splitext(os.path.basename(__file__))[0]
 file_name.replace(".py", "")
 
@@ -27,32 +29,32 @@ full_opt_name = "full"
 
 sol_mat_basename = "awesome_jump"
 
+rospack = rospkg.RosPack()
+package_path = rospack.get_path("moving_horizon_jnt_calib")
 
 def main(args):
     
     a = True
 
 def calibrate():
-
-    rot_dyn_cal = OfflineRotDynCal(args.data_basepath)
-
+        
+    rot_dyn_cal = OfflineRotDynCal(args.data_basepath, 
+                                   args.config_path)
 
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser(
         description='Script to perform rotor dynamics calibration with offline-data')
 
-    parser.add_argument('--data_basepath', '-dpath', type=str, default="/media/andreap/super_storage/mhe_bags/robot_state_log__0_2023_03_24__17_47_38.mat")
+    parser.add_argument('--data_basepath', '-dpath', type = str, 
+                        default = "/media/andreap/super_storage/mhe_bags/MheRt__0_2023_04_18__14_39_37.mat")
     
-    parser.add_argument('--gnagna', '-gnagna', type=str2bool, \
-                        help='', default=True)
+    parser.add_argument('--config_path', '-cpath', type = str, default = package_path + "/config/jnt_mhe_opt_concert.yaml")
 
+    parser.add_argument('--verbose', '-v', type = str2bool, \
+                        help='', default = False)
+    
     args = parser.parse_args()
-
-    rospackage = rospkg.RosPack()  # Only for taking the path to the leg package
-#    exec_path = rospackage.get_path("awesome_leg") + "/src/horizon_code""
-
-    # os.mkdir(args.results_dir)
 
     calibrate()
 

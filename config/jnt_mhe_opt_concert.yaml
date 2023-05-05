@@ -13,17 +13,12 @@ jnt_list: ["J2_E"] # joints to be moved
 
 red_ratio: [160]  # gear reduction ratio of the actuator --> from link to motor
 
-K_t: [-0.14]
-rotor_MoI: [3.26e-4]
-K_d0: [0.0]
-K_d1: [0.0]
-
-K_t_ig: [-0.14]
+K_t_ig: [0.14]
 rot_MoI_ig: [3.26e-4]
 K_d0_ig: [0.0] # initial guess for the static friction torque coefficient ( tau_d0 = K_d* sign(joint_vel) )
 K_d1_ig: [0.0] # initial guess for the dynamical friction torque coefficient ( tau_d1 = K_d* joint_vel )
 
-K_t_nom: [-0.14]
+K_t_nom: [0.14]
 rot_MoI_nom: [3.26e-4]
 K_d0_nom: [0.0] # initial guess for the static friction torque coefficient ( tau_d0 = K_d* sign(joint_vel) )
 K_d1_nom: [0.0] # initial guess for the dynamical friction torque coefficient ( tau_d1 = K_d* joint_vel )
