@@ -53,6 +53,8 @@ def calibrate():
     print("Kt: " + str(rot_dyn_cal.kt_opt))
     print("rot_MoI: " + str(rot_dyn_cal.rot_moi_opt))
 
+    print("regression error: " + str(rot_dyn_cal.calibrator.get_regr_error()))
+
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser(
