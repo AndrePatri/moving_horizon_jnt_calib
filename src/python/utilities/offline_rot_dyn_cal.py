@@ -13,13 +13,16 @@ class OfflineRotDynCal:
   def __init__(self, 
               matpath, 
               config_path, 
-              verbose = False):
+              verbose = False, 
+              use_prev_sol_reg = False):
 
     self.config_path = config_path
 
     self.matpath = matpath
     
     self.verbose = verbose
+
+    self.use_prev_sol_reg = use_prev_sol_reg
 
     self.load_config()
     self.load_data_from_mat()
@@ -90,12 +93,12 @@ class OfflineRotDynCal:
     
   def init_calibrator(self):
 
-    self.rot_dyn_cal = cal_utils.RotDynCal(self.window_size, 
-                                          self.red_ratio, 
-                                          self.K_t_ig, 
-                                          self.rot_MoI_ig, 
-                                          self.K_d0_ig, 
-                                          self.K_d1_ig, 
+    self.calibrator = cal_utils.RotDynCal(self.window_size, 
+                                          np.reciprocal(np.array(self.red_ratio).astype(float)), 
+                                          self.K_t_nom, 
+                                          self.rot_MoI_nom, 
+                                          self.K_d0_nom, 
+                                          self.K_d1_nom, 
                                           self.lambda_reg,
                                           self.alpha, 
                                           self.q_dot_3sigma, 
@@ -103,20 +106,20 @@ class OfflineRotDynCal:
                                           True)
     
     
-    self.rot_dyn_cal.set_lambda_high(self.lambda_high)
-    self.rot_dyn_cal.set_solution_mask(self.cal_mask)
+    self.calibrator.set_lambda_high(self.lambda_high)
+    self.calibrator.set_solution_mask(self.cal_mask)
 
   def set_lambda(self, lambda_reg):
      
-    self.rot_dyn_cal.set_lambda(lambda_reg)
+    self.calibrator.set_lambda(lambda_reg)
 
   def set_lambda_high(self, lambda_high):
      
-    self.rot_dyn_cal.set_lambda_high(lambda_high)
+    self.calibrator.set_lambda_high(lambda_high)
 
   def set_solution_mask(self, cal_mask):
      
-    self.rot_dyn_cal.set_solution_mask(cal_mask)
+    self.calibrator.set_solution_mask(cal_mask)
 
   def fill_window_from_sample(self, index):
 
@@ -124,21 +127,21 @@ class OfflineRotDynCal:
     # data time series (this method allows to slide through the data back and forth
     # and test the results of the calibration at different times)
 
-    self.rot_dyn_cal.reset_window() # we tell the calibrator that
+    self.calibrator.reset_window() # we tell the calibrator that
     # we want to fill the window again (in case it was already filled with 
     # other data)
     self.current_window_index = index
     i = self.current_window_index
-    while(not self.rot_dyn_cal.is_window_full()):
+    while(not self.calibrator.is_window_full()):
       
       # we stop adding samples when the window is full
-      self.rot_dyn_cal.add_sample(self.q_dot[:, i], 
-                                  self.q_ddot[:, i], 
-                                  self.tau_meas[:, i], 
-                                  self.iq_meas[:, i])
+      self.calibrator.add_sample(self.q_dot[:, i], 
+                                  self.q_ddot[:, i],
+                                  self.iq_meas[:, i],
+                                  self.tau_meas[:, i])
       
       i += 1
-
+      
     self.current_window["q_dot"] = \
       self.q_dot[:, self.current_window_index: self.current_window_index + self.window_size]
     self.current_window["q_ddot"] = \
@@ -150,14 +153,21 @@ class OfflineRotDynCal:
 
   def run_calibration(self):
 
-    if(self.rot_dyn_cal.is_window_full()):
+    if(self.calibrator.is_window_full()):
       
-      self.rot_dyn_cal.solve()
+      self.calibrator.solve()
 
       self.cal_windows.append(self.current_window)
 
-      self.rot_dyn_cal.reset_window() # we force a call to fill_window_from_sample
+      self.calibrator.reset_window() # we force a call to fill_window_from_sample
       # before the solve method can be called again
+
+      if (self.use_prev_sol_reg):
+        
+        self.calibrator.set_ig_Kd0(self.calibrator.get_opt_Kd0())
+        self.calibrator.set_ig_Kd1(self.calibrator.get_opt_Kd1())
+        self.calibrator.set_ig_Kt(self.calibrator.get_opt_Kt())
+        self.calibrator.set_ig_MoI(self.calibrator.get_opt_rot_MoI())
     
     else:
 
@@ -165,13 +175,13 @@ class OfflineRotDynCal:
 
   def retrieve_solution_data(self):
 
-    self.regr_error.append(self.rot_dyn_cal.get_regr_error())
-    self.sol_millis.append(self.rot_dyn_cal.get_sol_millis())
+    self.regr_error.append(self.calibrator.get_regr_error())
+    self.sol_millis.append(self.calibrator.get_sol_millis())
 
-    self.kd0_opt.append(self.rot_dyn_cal.get_opt_Kd0())
-    self.kd1_opt.append(self.rot_dyn_cal.get_opt_Kd1())
-    self.kt_opt.append(self.rot_dyn_cal.get_opt_Kt())
-    self.rot_moi_opt.append(self.rot_dyn_cal.get_opt_rot_MoI())
+    self.kd0_opt.append(self.calibrator.get_opt_Kd0())
+    self.kd1_opt.append(self.calibrator.get_opt_Kd1())
+    self.kt_opt.append(self.calibrator.get_opt_Kt())
+    self.rot_moi_opt.append(self.calibrator.get_opt_rot_MoI())
     
     
 
