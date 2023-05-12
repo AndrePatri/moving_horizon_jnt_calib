@@ -8,10 +8,9 @@ find_package(matlogger2 REQUIRED)
 find_package(Eigen3 REQUIRED)
 find_package(awesome_utils REQUIRED)
 find_package(XBotInterface REQUIRED)
-find_package(xbot2 REQUIRED)
 find_package(cartesian_interface REQUIRED)
 find_package(matlogger2 REQUIRED)
-
+find_package(xbot_msgs REQUIRED)
 set(EC_CLIENT_SKIP_ECAT_MASTER TRUE) #hack
 find_package(ec_xbot2_client QUIET)
 if(ec_xbot2_client_FOUND)
