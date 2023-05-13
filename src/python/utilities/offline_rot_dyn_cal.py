@@ -3,6 +3,7 @@ import awesome_utils.awesome_pyutils as cal_utils
 import matlogger2.matlogger as log_utils
 import yaml
 import numpy as np
+import matplotlib.pyplot as plt
 
 def str2bool(v: str):
   #susendberg's function
@@ -14,7 +15,11 @@ class OfflineRotDynCal:
               matpath, 
               config_path, 
               verbose = False, 
-              use_prev_sol_reg = False):
+              use_prev_sol_reg = False, 
+              overwrite_window_lentgh = False, 
+              window_length = 10000):
+
+    self.overwrite_window_lentgh = overwrite_window_lentgh
 
     self.config_path = config_path
 
@@ -37,8 +42,91 @@ class OfflineRotDynCal:
     self.rot_moi_opt = []
     self.regr_error = []
     self.sol_millis = []
+    self.correlation = []
 
     self.current_window = {}
+  
+  class ConvMap:
+
+    def __init__(self, 
+                q_dot, 
+                q_ddot, 
+                tau,
+                ref_signal):
+
+      self.q_dot = q_dot
+      self.q_ddot = q_ddot
+      self.tau = tau
+
+      self.ref_signal = np.transpose(ref_signal)
+      
+      err = 0
+      if (self.q_dot.shape[0] != self.q_ddot.shape[0]):
+        err +=1
+      if (self.q_ddot.shape[0] != self.tau.shape[0]):
+        err +=1
+      if (self.tau.shape[0] != self.ref_signal.shape[0]):
+        err +=1
+
+      if err != 0:
+        raise Exception("OfflineRotDynCal.load_data_from_matThe loaded(): the number of samples in the loaded data do not match!!!") 
+
+      err2 = 0
+      if (self.q_dot.shape[1] != self.q_ddot.shape[1]):
+        err2 +=1
+      if (self.q_ddot.shape[1] != self.tau.shape[1]):
+        err2 +=1
+      if (self.tau.shape[1] != self.ref_signal.shape[1]):
+        err2 +=1
+
+      if err2 != 0:
+        raise Exception("OfflineRotDynCal.load_data_from_matThe loaded(): the number of joints in the loaded data do not match!!!") 
+
+      self.n_jnts = self.q_dot.shape[0]
+      self.n_samples = self.q_dot.shape[1]
+
+      self.conv_map = {}
+      self.conv_map["q_dot"] = np.zeros((self.n_jnts))
+      self.conv_map["q_ddot"] = np.zeros((self.n_jnts))
+      self.conv_map["tau"] = np.zeros((self.n_jnts))
+
+      self.compute_convolution()
+
+    def compute_convolution(self):
+      
+      self.q_dot_nom = self.normalize(self.q_dot)
+      self.q_ddot_norm = self.normalize(self.q_ddot)
+      self.tau_norm = self.normalize(self.tau)
+      self.ref_signal_norm = self.normalize(self.ref_signal)
+
+      for i in range(self.n_jnts):
+
+        self.conv_map["q_dot"][i] = (np.dot(self.q_dot_nom[i, :], self.ref_signal_norm[i, :])) / self.n_samples
+        self.conv_map["q_ddot"][i] = (np.dot(self.q_ddot_norm[i, :] , self.ref_signal_norm[i, :])) / self.n_samples
+        self.conv_map["tau"][i] = (np.dot(self.tau_norm[i, :], self.ref_signal_norm[i, :])) / self.n_samples
+    
+    def normalize(self, signal):
+
+        scale_max = np.amax(signal, axis = 1)
+        scale_min = np.amin(signal, axis = 1)
+
+        signal_norm = np.zeros((signal.shape[0], signal.shape[1]))
+
+        for i in range(0, self.n_jnts):
+          
+          scale = 1
+
+          if (abs(scale_max[i]) > abs(scale_min[i])):
+
+            scale = abs(scale_max[i])
+          
+          else:
+
+            scale = abs(scale_min[i])
+
+          signal_norm[i, :] = signal[i, :] / scale
+
+        return signal_norm
 
   def load_config(self):
 
@@ -48,7 +136,11 @@ class OfflineRotDynCal:
       except yaml.YAMLError as exc:
           print(exc)
 
-    self.window_size = self.mhe_config_file["rot_calib_window_size"]
+    if not self.overwrite_window_lentgh:    
+      self.window_size = self.mhe_config_file["rot_calib_window_size"]
+    else:
+      self.window_size = window_length
+
     self.alpha = self.mhe_config_file["alpha"]
     self.q_dot_3sigma = self.mhe_config_file["q_dot_3sigma"]
     self.cal_mask = self.mhe_config_file["cal_mask"]
@@ -80,6 +172,8 @@ class OfflineRotDynCal:
     self.tau_meas = self.logger.readvar("tau_meas")
     self.iq_meas = self.logger.readvar("iq_meas")
 
+    self.loop_time = self.logger.readvar("loop_time")
+
     err = 0
     if (self.q_dot.shape[1] != self.q_ddot.shape[1]):
       err +=1
@@ -104,7 +198,6 @@ class OfflineRotDynCal:
                                           self.q_dot_3sigma, 
                                           self.verbose, 
                                           True)
-    
     
     self.calibrator.set_lambda_high(self.lambda_high)
     self.calibrator.set_solution_mask(self.cal_mask)
@@ -173,9 +266,23 @@ class OfflineRotDynCal:
 
       print("run_calibration(): calibration will not be run. You have to finish filling the data window first!")
 
-  def retrieve_solution_data(self):
+  def add_solution_data(self):
 
-    self.regr_error.append(self.calibrator.get_regr_error())
+    current_regr_error = self.calibrator.get_regr_error()
+
+    self.regr_error.append(current_regr_error)
+    
+    self.correlation.append(OfflineRotDynCal.ConvMap(self.q_dot[:, self.current_window_index: self.current_window_index + self.window_size], 
+                                    self.q_ddot[:, self.current_window_index: self.current_window_index + self.window_size], 
+                                    self.tau_meas[:, self.current_window_index: self.current_window_index + self.window_size], 
+                                    current_regr_error))
+
+    print(self.correlation[0].conv_map["q_dot"])
+    print(self.correlation[0].conv_map["q_ddot"])
+    print(self.correlation[0].conv_map["tau"])
+
+    exit()
+
     self.sol_millis.append(self.calibrator.get_sol_millis())
 
     self.kd0_opt.append(self.calibrator.get_opt_Kd0())
@@ -183,7 +290,21 @@ class OfflineRotDynCal:
     self.kt_opt.append(self.calibrator.get_opt_Kt())
     self.rot_moi_opt.append(self.calibrator.get_opt_rot_MoI())
     
-    
+  def make_plots(self):
+
+    fontsize = 14
+    f, ax = plt.subplots(1)
+
+    ax.plot(self.loop_time[0, self.current_window_index:self.current_window_index + self.window_size], self.regr_error[0], drawstyle='steps-post')
+
+    ax.set_xlabel(r'[$\mathrm{s}$]',  fontsize=fontsize)
+    ax.set_ylabel(r'[$\mathrm{N}$]', fontsize=fontsize)
+    ax.set_title(r"$\mathrm{MHE\,regression\,error}$", fontsize=fontsize)
+    ax.grid()
+    legend = ax.legend([r"$\mathrm{regr}_{\mathrm{err}}$"], fontsize=fontsize)
+    legend.set_draggable(state = True)
+
+    plt.show()
 
   
     
